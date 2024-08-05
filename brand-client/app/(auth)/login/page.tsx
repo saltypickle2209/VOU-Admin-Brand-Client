@@ -6,7 +6,7 @@ export default function Page() {
             <div className="flex flex-col-reverse rounded-2xl bg-white shadow-lg shadow-violet-950 w-full h-auto p-8 md:flex-row">
                 <div className="flex flex-col rounded-2xl w-full overflow-auto shrink-0 md:w-2/5 relative">
                     <div className="w-full grow absolute inset-0 md:relative">
-                        <Image src="/auth_hero_image.png" fill={true} objectFit="cover" alt="Hero Image"/>
+                        <Image src="/auth_hero_image.png" fill={true} alt="Hero Image" className="object-cover"/>
                     </div>
                     <div className="flex h-24 bg-violet-400 justify-center items-center rounded-2xl m-4 p-8 z-10 md:h-32 md:m-0 md:rounded-none">
                         <p className="text-xl font-extrabold text-center text-gray-950 lg:text-2xl">Create your own events</p>
