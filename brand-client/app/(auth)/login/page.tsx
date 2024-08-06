@@ -1,4 +1,10 @@
+import { Metadata } from 'next';
 import Image from 'next/image';
+import Link from 'next/link';
+
+export const metadata: Metadata = {
+    title: 'Log In',
+};
 
 export default function Page() {
     return (
@@ -18,16 +24,23 @@ export default function Page() {
                         <h1 className="text-3xl md:text-4xl font-extrabold text-gray-950">Log In</h1>
                         <p className="text-sm text-gray-500 mt-2">
                             Not registered yet? {' '}
-                            <a href='/' className="text-gray-950 font-bold hover:text-violet-800 transition-colors duration-300">
+                            <Link href='/register' className="text-gray-950 font-bold hover:text-violet-800 transition-colors duration-300">
                                 Sign up
-                            </a>
+                            </Link>
                         </p>
                     </div>
 
                     <form className="flex flex-col gap-8">
-                        <input type="text" className="mt-0 w-full px-0.5 font-medium border-0 border-b-2 border-gray-500 focus:ring-0 focus:border-violet-800 placeholder:text-gray-500 placeholder:font-medium focus:placeholder:text-violet-800 transition-colors duration-300" placeholder="Username"/>
-                        <input type="password" className="mt-0 w-full px-0.5 font-medium border-0 border-b-2 border-gray-500 focus:ring-0 focus:border-violet-800 placeholder:text-gray-500 placeholder:font-medium focus:placeholder:text-violet-800 transition-colors duration-300" placeholder="Password"/>
+                        <div className="relative z-0 w-full">
+                            <input id="username" type="text" className="block mt-0 w-full px-0 font-medium bg-transparent border-0 border-b-2 border-gray-500 focus:ring-0 focus:border-violet-800 transition-colors duration-300 peer" placeholder=" "/>
+                            <label htmlFor="username" className="after:content-['*'] after:ml-1 after:text-red-500 absolute font-medium text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 z-10 origin-[0] peer-focus:start-0 peer-focus:text-violet-800 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Username</label>
+                        </div>
 
+                        <div className="relative z-0 w-full">
+                            <input id="password" type="password" className="block mt-0 w-full px-0 font-medium bg-transparent border-0 border-b-2 border-gray-500 focus:ring-0 focus:border-violet-800 transition-colors duration-300 peer" placeholder=" "/>
+                            <label htmlFor="password" className="after:content-['*'] after:ml-1 after:text-red-500 absolute font-medium text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 z-10 origin-[0] peer-focus:start-0 peer-focus:text-violet-800 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Password</label>
+                        </div>
+                        
                         <button type="submit" className="w-full rounded-lg py-3 bg-gray-950 text-violet-50 font-bold hover:bg-violet-800 transition-colors duration-300">Log In</button>
                     </form>
 
