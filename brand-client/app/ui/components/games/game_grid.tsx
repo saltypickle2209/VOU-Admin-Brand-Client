@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from 'next/image';
 import {
     CalendarDaysIcon,
     PuzzlePieceIcon,
@@ -81,11 +80,11 @@ export default function GamesGrid({ query, currentPage }: { query: string, curre
                             <div className="grow flex flex-col gap-y-1 justify-between sm:flex-row sm:gap-x-2 sm:gap-y-0">
                                 <div className="flex flex-row items-center gap-x-2 sm:flex-col sm:items-start sm:gap-x-0">
                                     <p className="text-xs font-light text-gray-500">From</p>
-                                    <p className="text-sm font-semibold text-gray-700 text-ellipsis">{game.start_time}</p>
+                                    <p className="text-xs font-semibold text-gray-700 text-ellipsis sm:text-sm">{game.start_time}</p>
                                 </div>
                                 <div className="flex flex-row items-center gap-x-2 sm:flex-col sm:items-start sm:gap-x-0">
                                     <p className="text-xs font-light text-gray-500">to</p>
-                                    <p className="text-sm font-semibold text-gray-700 text-elipsis">{game.end_time}</p>
+                                    <p className="text-xs font-semibold text-gray-700 text-elipsis sm:text-sm">{game.end_time}</p>
                                 </div>
                             </div>
                         </div>

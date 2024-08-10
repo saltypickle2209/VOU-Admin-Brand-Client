@@ -8,6 +8,11 @@ export async function revalidateDashboard() {
     redirect('/dashboard')
 }
 
+export async function revalidateEvents() {
+    revalidatePath('/events')
+    redirect('/events')
+}
+
 export async function revalidateGames() {
     revalidatePath('/games')
     redirect('/games')
