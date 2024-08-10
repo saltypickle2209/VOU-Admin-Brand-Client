@@ -7,3 +7,8 @@ export async function revalidateDashboard() {
     revalidatePath('/dashboard')
     redirect('/dashboard')
 }
+
+export async function revalidateGames() {
+    revalidatePath('/games')
+    redirect('/games')
+}

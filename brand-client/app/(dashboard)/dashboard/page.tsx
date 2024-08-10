@@ -5,8 +5,8 @@ import {
 import { revalidateDashboard } from "@/app/lib/action";
 import Statistics from "@/app/ui/components/dashboard/statistics";
 import PlayerChart from "@/app/ui/components/dashboard/player_chart";
-import DonutChart from "@/app/ui/components/dashboard/donut_chart";
 import TopEvents from "@/app/ui/components/dashboard/top_events";
+import VoucherChart from "@/app/ui/components/dashboard/voucher_chart";
 
 export const metadata: Metadata = {
     title: 'Dashboard',
@@ -14,8 +14,8 @@ export const metadata: Metadata = {
 
 export default function Page() {
     return (
-        <main className="flex flex-col space-y-4">
-            <h1 className="text-3xl font-extrabold text-gray-950">👋 Hello there!</h1>
+        <main className="flex flex-col gap-y-4">
+            <h1 className="text-3xl font-bold text-gray-950">👋 Hello there!</h1>
             <div className="flex flex-row justify-end items-center md:justify-between">
                 <p className="text-sm text-gray-500 hidden md:block">Your data will be automatically refreshed every 1 hour</p>
                 <form action={revalidateDashboard}>
@@ -28,7 +28,7 @@ export default function Page() {
             <Statistics/>
             <div className="flex flex-col gap-4 xl:flex-row">
                 <PlayerChart/>
-                <DonutChart/>
+                <VoucherChart/>
             </div>
             <TopEvents/>
         </main>
