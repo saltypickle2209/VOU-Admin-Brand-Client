@@ -58,7 +58,7 @@ export default function EventsGrid({ query, currentPage }: { query: string, curr
                 return (
                     <Link key={event.id} href="/" className="flex flex-col h-full gap-y-2 p-4 bg-white rounded-md shadow-md overflow-hidden hover:bg-gray-100 transition-colors duration-300">
                         <div className="flex w-full aspect-video rounded-md bg-slate-50 overflow-hidden">
-                            <img src={event.poster} alt="" className="object-cover"/>
+                            <img src={event.poster} alt="" className="object-cover w-full h-full"/>
                         </div>
                         <p className="text-gray-950 font-bold break-words line-clamp-2">{event.name}</p>
                         <div className="flex gap-x-4 items-center mt-auto">
