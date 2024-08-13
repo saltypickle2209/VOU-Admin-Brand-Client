@@ -5,7 +5,14 @@ export const metadata: Metadata = {
     title: 'Games',
 };
 
-export default function Page() {
+export default function Page({ params }: { params: { id: string}}) {
+    const id = params.id
+    // fetch game data
+
+    // check existence
+    // if(!data) {
+    //     notFound()
+    // }
     return (
         <main className="flex flex-col gap-y-4">
             <h1 className="text-3xl font-bold text-gray-950">🎮 Game's detail</h1>

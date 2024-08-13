@@ -3,6 +3,7 @@ import {
 } from '@heroicons/react/24/outline';
 import BasicInformation from './basic_information';
 
+// remember to add prop to this one
 export default function LiveQuizDetail(){
     return (
         <div className="w-full px-6 grid grid-cols-1 divide-y-2 divide-gray-300 lg:py-6 lg:px-0 lg:divide-y-0 lg:divide-x-2 lg:grid-cols-2 bg-white rounded-md shadow-md">

@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import Link from "next/link"
 
 export const metadata: Metadata = {
-    title: 'Games',
+    title: 'Create A Game',
 };
 
 export default function Page() {    

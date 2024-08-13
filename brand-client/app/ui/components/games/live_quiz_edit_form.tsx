@@ -9,23 +9,27 @@ import {
 } from '@heroicons/react/24/outline';
 import { ChangeEvent, FormEvent, useState } from 'react';
 import clsx from 'clsx';
-import { createLiveQuiz, LiveQuizFormState } from '@/app/lib/action';
+// import { createLiveQuiz, LiveQuizFormState } from '@/app/lib/action';
 import { useFormState } from 'react-dom';
-import { Question } from '@/app/lib/definition';
+import { LiveQuiz, Question } from '@/app/lib/definition';
+import { LiveQuizFormState, updateLiveQuiz } from '@/app/lib/action';
 
-// remember to add voucher list props
-export default function LiveQuizForm() {
+export default function LiveQuizEditForm({
+    data
+}: {
+    data: LiveQuiz
+}) {
     const initialState: LiveQuizFormState = { message: null, errors: {} }
-    const [state, formAction] = useFormState(createLiveQuiz, initialState)
+    const [state, formAction] = useFormState(updateLiveQuiz, initialState)
 
-    const [poster, setPoster] = useState<File | null>(null)
-    const [quizName, setQuizName] = useState<string>('')
-    const [quizDescription, setQuizDescription] = useState<string>('')
-    const [voucher, setVoucher] = useState<string>('')
-    const [voucherAmount, setVoucherAmount] = useState<number | ''>('')
-    const [startDate, setStartDate] = useState<string>('')
-    const [endDate, setEndDate] = useState<string>('')
-    const [questions, setQuestions] = useState<Question[]>([])
+    const [poster, setPoster] = useState<File | string | null>(data.poster)
+    const [quizName, setQuizName] = useState<string>(data.name)
+    const [quizDescription, setQuizDescription] = useState<string>(data.description)
+    const [voucher, setVoucher] = useState<string>(data.voucher)
+    const [voucherAmount, setVoucherAmount] = useState<number>(Number(data.amount))
+    const [startDate, setStartDate] = useState<string>(data.start_date)
+    const [endDate, setEndDate] = useState<string>(data.end_date)
+    const [questions, setQuestions] = useState<Question[]>(data.questions)
 
     const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
         if(event.target.files && event.target.files[0]){
@@ -61,7 +65,7 @@ export default function LiveQuizForm() {
 
     const handleSubmit = async (event: FormEvent) => {
         event.preventDefault();
-
+        
         const formData = new FormData()
         if(poster) formData.append('poster', poster)
         formData.append('name', quizName)
@@ -91,7 +95,19 @@ export default function LiveQuizForm() {
                             }
                         )}>
                             {poster ? (
-                                <img src={URL.createObjectURL(poster)} alt="Image Preview" className="w-full h-full object-cover"/>
+                                typeof poster  === 'string' ? (
+                                    poster !== '' ? (
+                                        <img src={poster} alt="Image Preview" className="w-full h-full object-cover"/>
+                                    ) : (
+                                        <>
+                                            <div className="absolute inset-4 border-2 border-violet-500 rounded-md hover:border-violet-800 transition-colors duration-300"></div>
+                                            <PhotoIcon className="w-16"/>
+                                            <p className="text-sm font-semibold">Choose your game's poster</p>
+                                        </>
+                                    )
+                                ) : (
+                                    <img src={URL.createObjectURL(poster)} alt="Image Preview" className="w-full h-full object-cover"/>
+                                )
                             ) : (
                                 <>
                                     <div className="absolute inset-4 border-2 border-violet-500 rounded-md hover:border-violet-800 transition-colors duration-300"></div>
@@ -105,6 +121,7 @@ export default function LiveQuizForm() {
                             <p className="text-xs text-red-700 mt-2" key={error}>{error}</p>
                         ))}
                     </div>
+                    
                     <div className="relative mt-2 flex flex-col">
                         <input type="text" id="name" value={quizName} className="block w-full py-2 px-0.5 text-sm text-gray-950 bg-transparent border-1 border-l-0 border-r-0 border-t-0 border-gray-500 focus:outline-none focus:ring-0 focus:border-violet-800 transition-colors duration-300 peer" placeholder=" " required onChange={(e) => setQuizName(e.target.value)}/>
                         <label htmlFor="name" className="absolute text-sm text-gray-500 transform -translate-y-6 scale-75 top-4 left-0.5 origin-top-left z-10 peer-focus:start-0 peer-focus:text-violet-800 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-2 peer-focus:scale-75 peer-focus:-translate-y-6 peer-focus:left-0.5 after:content-['*'] after:ml-0.5 after:text-red-500 duration-300">Name</label>
@@ -124,7 +141,7 @@ export default function LiveQuizForm() {
                             <select id="voucher" value={voucher} className="block w-full py-2 px-0.5 text-sm text-gray-950 bg-transparent border-1 border-l-0 border-r-0 border-t-0 border-gray-500 focus:outline-none focus:ring-0 focus:border-violet-800 transition-colors duration-300 peer" required onChange={(e) => setVoucher(e.target.value)}>
                                 <option value="">Select a voucher</option>
                                 <option value="1">Voucher A</option>
-                            <option value="2">Voucher B</option>
+                                <option value="2">Voucher B</option>
                             </select>
                             <label htmlFor="voucher" className="absolute text-sm text-gray-500 transform -translate-y-6 scale-75 top-4 left-0.5 origin-top-left z-10 peer-focus:text-violet-800 after:content-['*'] after:ml-0.5 after:text-red-500 duration-300">Voucher</label>
                             {state.errors?.voucher && state.errors.voucher.map((error: string) => (
@@ -155,7 +172,7 @@ export default function LiveQuizForm() {
                             ))}
                         </div>
                     </div>
-                    <button type="submit" className="w-full text-violet-50 text-sm font-bold bg-gray-950 py-4 px-2 rounded-md hover:bg-violet-800 transition-colors duration-300">Submit</button>
+                    <button type="submit" className="w-full text-violet-50 text-sm font-bold bg-gray-950 py-4 px-2 rounded-md hover:bg-violet-800 transition-colors duration-300">Update</button>
                     <div className="flex flex-col">
                         {state.message && (
                             <p className="text-xs text-red-700">{state.message}</p>
