@@ -23,32 +23,60 @@ const liveQuizQuestionSchema = z.object({
     question: z.string({
         required_error: "Question text is required",
         invalid_type_error: "Question text must be a string"
-    }).trim().min(1, { message: "Question text mustn't start with whitespace" }),
+    }).trim().min(1, { 
+        message: "Question text can't be a whitespace string" 
+    }).max(200, {
+        message: "Question text is too long" 
+    }),
     answerA: z.string({
         required_error: "This field is required",
         invalid_type_error: "This field must be a string"
-    }).trim().min(1, { message: "This field mustn't start with whitespace" }),
+    }).trim().min(1, { 
+        message: "Answer A can't be a whitespace string" 
+    }).max(100, {
+        message: "Answer A is too long" 
+    }),
     answerB: z.string({
         required_error: "This field is required",
         invalid_type_error: "This field must be a string"
-    }).trim().min(1, { message: "This field mustn't start with whitespace" }),
+    }).trim().min(1, { 
+        message: "Answer B can't be a whitespace string" 
+    }).max(100, {
+        message: "Answer B is too long" 
+    }),
     answerC: z.string({
         required_error: "This field is required",
         invalid_type_error: "This field must be a string"
-    }).trim().min(1, { message: "This field mustn't start with whitespace" }),
+    }).trim().min(1, { 
+        message: "Answer C can't be a whitespace string" 
+    }).max(100, {
+        message: "Answer C is too long" 
+    }),
     answerD: z.string({
         required_error: "This field is required",
         invalid_type_error: "This field must be a string"
-    }).trim().min(1, { message: "This field mustn't start with whitespace" }),
+    }).trim().min(1, { 
+        message: "Answer D can't be a whitespace string" 
+    }).max(100, {
+        message: "Answer D is too long" 
+    }),
     correctAnswer: z.enum(['0', '1', '2', '3'], { message: "Invalid choice"}),
     scriptPostQuestion: z.string({
         required_error: "This field is required",
         invalid_type_error: "This field must be a string"
-    }).trim().min(1, { message: "This field mustn't start with whitespace" }),
+    }).trim().min(1, { 
+        message: "Post-question comment can't be a whitespace string"
+    }).max(500, {
+        message: "Post-question comment is too long" 
+    }),
     scriptAnswer: z.string({
         required_error: "This field is required",
         invalid_type_error: "This field must be a string"
-    }).trim().min(1, { message: "This field mustn't start with whitespace" })
+    }).trim().min(1, { 
+        message: "Answer comment can't be a whitespace string" 
+    }).max(500, {
+        message: "Answer comment is too long" 
+    })
 })
 
 const liveQuizSchema = z.object({
@@ -62,13 +90,15 @@ const liveQuizSchema = z.object({
         required_error: "Quiz's name is required",
         invalid_type_error: "Quiz's name must be a string"
     }).trim().min(1, { 
-        message: "Quiz's name mustn't start with whitespace" 
+        message: "Quiz's name can't be a whitespace string" 
+    }).max(200, {
+        message: "Quiz's name is too long" 
     }),
     description: z.string({
         required_error: "Quiz's description is required",
         invalid_type_error: "Quiz's description must be a string"
     }).trim().min(1, {
-        message: "Quiz's description mustn't start with whitespace" 
+        message: "Quiz's description can't be a whitespace string" 
     }).max(500, {
         message: "Quiz's description is too long" 
     }),
@@ -76,7 +106,7 @@ const liveQuizSchema = z.object({
         required_error: "Quiz's description is required",
         invalid_type_error: "Quiz's description must be a string"
     }).trim().min(1, { 
-        message: "Quiz's description mustn't start with whitespace" 
+        message: "Quiz's description can't be a whitespace string" 
     }),
     amount: z.coerce.number({
         required_error: "Amount is required",
@@ -89,7 +119,15 @@ const liveQuizSchema = z.object({
     startDate: z.string({
         required_error: "Start date is required",
         invalid_type_error: "Start date must be a string"
-    }).date("Invalid start date"),
+    }).date("Invalid start date").refine(date => {
+        const today = new Date()
+        const parsedDate = new Date(date)
+        today.setHours(0, 0, 0, 0)
+        parsedDate.setHours(0, 0, 0, 0)
+        return parsedDate >= today
+    }, {
+        message: "Start date must be today or later"
+    }),
     endDate: z.string({
         required_error: "End date is required",
         invalid_type_error: "End date must be a string"
