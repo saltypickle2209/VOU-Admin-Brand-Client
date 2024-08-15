@@ -77,12 +77,12 @@ export default function GamesGrid({ query, currentPage }: { query: string, curre
                         <p className="text-gray-950 font-bold break-words line-clamp-2">{game.name}</p>
                         <div className="flex gap-x-4 items-center">
                             <CalendarDaysIcon className="w-5 text-gray-500 shrink-0"/>
-                            <div className="grow flex flex-col gap-y-1 justify-between sm:flex-row sm:gap-x-2 sm:gap-y-0">
-                                <div className="flex flex-row items-center gap-x-2 sm:flex-col sm:items-start sm:gap-x-0">
+                            <div className="flex-1 overflow-hidden flex flex-col gap-y-1 justify-between sm:flex-row sm:gap-x-2 sm:gap-y-0">
+                                <div className="flex truncate flex-col items-start">
                                     <p className="text-xs font-light text-gray-500">From</p>
-                                    <p className="text-xs font-semibold text-gray-700 text-ellipsis sm:text-sm">{game.start_time}</p>
+                                    <p className="text-xs font-semibold text-gray-700 sm:text-sm">{game.start_time}</p>
                                 </div>
-                                <div className="flex flex-row items-center gap-x-2 sm:flex-col sm:items-start sm:gap-x-0">
+                                <div className="flex truncate flex-col items-start">
                                     <p className="text-xs font-light text-gray-500">to</p>
                                     <p className="text-xs font-semibold text-gray-700 text-elipsis sm:text-sm">{game.end_time}</p>
                                 </div>

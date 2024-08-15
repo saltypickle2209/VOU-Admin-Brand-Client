@@ -36,7 +36,7 @@ export default function Page({
                 </form>
             </div>
             <div className="flex justify-between items-center gap-4">
-                <Link href="/" className="flex shrink-0 items-center justify-center gap-2 rounded-md px-4 py-2 bg-violet-500 text-violet-50 text-sm font-bold hover:bg-violet-800 transition-colors duration-300">
+                <Link href="/events/create" className="flex shrink-0 items-center justify-center gap-2 rounded-md px-4 py-2 bg-violet-500 text-violet-50 text-sm font-bold hover:bg-violet-800 transition-colors duration-300">
                     <PlusIcon className="w-6 md:w-5"/>
                     <p className="hidden md:block">New</p>
                 </Link>

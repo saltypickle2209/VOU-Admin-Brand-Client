@@ -19,3 +19,15 @@ export type LiveQuiz = {
     end_date: string,
     questions: Question[]
 }
+
+export type Game = {
+    id: string,
+    poster: string,
+    name: string,
+    description: string,
+    start_date: string,
+    end_date: string,
+    game_type_id: string,
+    voucher: string,
+    amount: string
+}
