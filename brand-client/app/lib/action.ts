@@ -417,3 +417,145 @@ export async function updateLiveQuiz(prevState: LiveQuizFormState, formData: For
         redirect("/games")
     }
 }
+
+const eventGameSchema = z.object({
+    id: z.string({
+        required_error: "Invalid data",
+        invalid_type_error: "Invalid data"
+    }),
+    poster: z.string({
+        required_error: "Invalid data",
+        invalid_type_error: "Invalid data"
+    }).url({
+        message: "Invalid data"
+    }),
+    name: z.string({
+        required_error: "Invalid data",
+        invalid_type_error: "Invalid data"
+    }),
+    description: z.string({
+        required_error: "Invalid data",
+        invalid_type_error: "Invalid data"
+    }),
+    start_date: z.string({
+        required_error: "Invalid data",
+        invalid_type_error: "Invalid data"
+    }),
+    end_date: z.string({
+        required_error: "Invalid data",
+        invalid_type_error: "Invalid data"
+    }),
+    game_type_id: z.string({
+        required_error: "Invalid data",
+        invalid_type_error: "Invalid data"
+    }),
+    voucher: z.string({
+        required_error: "Invalid data",
+        invalid_type_error: "Invalid data"
+    }),
+    amount: z.string({
+        required_error: "Invalid data",
+        invalid_type_error: "Invalid data"
+    })
+})
+
+const createEventSchema = z.object({
+    poster: z.instanceof(File, {
+        message: "Poster must be JPEG or PNG file"
+    }).refine(file => {
+        const allowedTypes = ['image/jpeg', 'image/png'];
+        return allowedTypes.includes(file.type);
+    }, { 
+        message: "File type must be JPEG or PNG"
+    }),
+    name: z.string({
+        required_error: "Event's name is required",
+        invalid_type_error: "Event's name must be a string"
+    }).trim().min(1, { 
+        message: "Event's name can't be a whitespace string" 
+    }).max(200, {
+        message: "Event's name is too long" 
+    }),
+    description: z.string({
+        required_error: "Event's description is required",
+        invalid_type_error: "Event's description must be a string"
+    }).trim().min(1, {
+        message: "Event's description can't be a whitespace string" 
+    }).max(500, {
+        message: "Event's description is too long" 
+    }),
+    startDate: z.string({
+        required_error: "Start date is required",
+        invalid_type_error: "Start date must be a string"
+    }).date("Invalid start date"),
+    endDate: z.string({
+        required_error: "End date is required",
+        invalid_type_error: "End date must be a string"
+    }).date("Invalid end date"),
+    games: z.array(eventGameSchema).nonempty({
+        message: "Game list can't be empty"
+    }).max(10, {
+        message: "Game list cannot exceed 10 questions"
+    })
+}).refine(data => new Date(data.endDate) > new Date(data.startDate), {
+    message: "End date must be later than start date",
+    path: ["endDate"]
+})
+
+export type EventFormState = {
+    errors?: {
+        poster?: string[],
+        name?: string[],
+        description?: string[],
+        startDate?: string[],
+        endDate?: string[],
+        games?: string[]
+    },
+    message?: string | null
+}
+
+export async function createEvent(prevState: EventFormState, formData: FormData): Promise<EventFormState>{
+    let gamesJSONString: any = ''
+
+    try {
+        console.log(formData)
+        gamesJSONString = formData.get('games')
+        if(typeof gamesJSONString !== 'string'){
+            throw new Error()
+        }
+    } catch (error) {
+        console.log(error)
+        return {
+            message: "Something went wrong!"
+        }
+    }
+
+    const validateFields = createEventSchema.safeParse({
+        poster: formData.get('poster'),
+        name: formData.get('name'),
+        description: formData.get('description'),
+        startDate: formData.get('startDate'),
+        endDate: formData.get('endDate'),
+        games: JSON.parse(gamesJSONString)
+    })
+
+    if(!validateFields.success) {
+        const errors = validateFields.error.flatten().fieldErrors
+        console.log("-------------------------------------")
+        console.log(errors)
+        console.log("-------------------------------------")
+
+        return {
+            errors: errors,
+            message: "Invalid Form. Try filling it in correctly and submit again."
+        }
+    }
+    else {
+        console.log("Passed validation")
+
+        // Pack data and send to express server
+
+        revalidatePath("/events")
+        redirect("/events")
+    }
+}

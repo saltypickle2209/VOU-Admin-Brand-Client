@@ -14,8 +14,12 @@ import { useFormState } from 'react-dom';
 import { Game } from '@/app/lib/definition';
 import ChooseGameModal from './choose_game_modal';
 import { formatDate } from '@/app/lib/utility';
+import { createEvent, EventFormState } from '@/app/lib/action';
 
 export default function EventForm() {
+    const initialState: EventFormState = { message: null, errors: {} }
+    const [state, formAction] = useFormState(createEvent, initialState)
+
     const [poster, setPoster] = useState<File | null>(null)
     const [eventName, setEventName] = useState<string>('')
     const [eventDescription, setEventDescription] = useState<string>('')
@@ -71,6 +75,8 @@ export default function EventForm() {
         formData.append('startDate', startDate)
         formData.append('endDate', endDate)
         formData.append('games', JSON.stringify(games))
+
+        formAction(formData)
     }
 
     return (
@@ -100,23 +106,23 @@ export default function EventForm() {
                                 )}
                                 <input id="poster" type="file" className="hidden" accept="image/png, image/jpeg" onChange={handleImageChange}/>
                             </label>
-                            {/* {state.errors?.poster && state.errors.poster.map((error: string) => (
+                            {state.errors?.poster && state.errors.poster.map((error: string) => (
                                 <p className="text-xs text-red-700 mt-2" key={error}>{error}</p>
-                            ))} */}
+                            ))}
                         </div>
                         <div className="relative mt-2 flex flex-col">
                             <input type="text" id="name" value={eventName} className="block w-full py-2 px-0.5 text-sm text-gray-950 bg-transparent border-1 border-l-0 border-r-0 border-t-0 border-gray-500 focus:outline-none focus:ring-0 focus:border-violet-800 transition-colors duration-300 peer" placeholder=" " required onChange={(e) => setEventName(e.target.value)}/>
                             <label htmlFor="name" className="absolute text-sm text-gray-500 transform -translate-y-6 scale-75 top-4 left-0.5 origin-top-left z-10 peer-focus:start-0 peer-focus:text-violet-800 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-2 peer-focus:scale-75 peer-focus:-translate-y-6 peer-focus:left-0.5 after:content-['*'] after:ml-0.5 after:text-red-500 duration-300">Name</label>
-                            {/* {state.errors?.name && state.errors.name.map((error: string) => (
+                            {state.errors?.name && state.errors.name.map((error: string) => (
                                 <p className="text-xs text-red-700 mt-2" key={error}>{error}</p>
-                            ))} */}
+                            ))}
                         </div>
                         <div className="relative mt-2 flex flex-col">
                             <textarea id="description" value={eventDescription} maxLength={500} rows={8} className="resize-none block w-full p-2 text-sm text-gray-950 bg-transparent rounded-md border-1 border-gray-500 focus:outline-none focus:ring-0 focus:border-violet-800 transition-colors duration-300 peer" placeholder=" " required onChange={(e) => setEventDescription(e.target.value)}/>
                             <label htmlFor="description" className="absolute bg-white px-2 rounded-full text-sm text-gray-500 transform -translate-y-6 scale-75 top-4 left-0.5 origin-top-left z-10 peer-focus:start-0 peer-focus:text-violet-800 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-2 peer-focus:scale-75 peer-focus:-translate-y-6 peer-focus:left-0.5 after:content-['*'] after:ml-0.5 after:text-red-500 duration-300">Description</label>
-                            {/* {state.errors?.description && state.errors.description.map((error: string) => (
+                            {state.errors?.description && state.errors.description.map((error: string) => (
                                 <p className="text-xs text-red-700 mt-2" key={error}>{error}</p>
-                            ))} */}
+                            ))}
                         </div>
                         <div className="flex flex-col gap-y-2">
                             <p className="text-xs text-gray-500">The below fields will be automatically adjusted when you add a game</p>
@@ -124,22 +130,28 @@ export default function EventForm() {
                                 <div className="relative w-1/2 flex flex-col">
                                     <input type="date" id="start_date" value={startDate} className="block w-full py-2 px-0.5 text-sm text-gray-950 bg-transparent border-1 border-l-0 border-r-0 border-t-0 border-gray-500 focus:outline-none focus:ring-0 focus:border-violet-800 disabled:bg-gray-100 disabled:rounded-sm disabled:cursor-not-allowed transition-colors duration-300 peer" placeholder=" " required disabled/>
                                     <label htmlFor="start_date" className="absolute text-sm text-gray-500 transform -translate-y-6 scale-75 top-4 left-0.5 origin-top-left z-10 peer-focus:start-0 peer-focus:text-violet-800 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-2 peer-focus:scale-75 peer-focus:-translate-y-6 peer-focus:left-0.5 peer-disabled:bg-white peer-disabled:px-2 peer-disabled:rounded-full after:content-['*'] after:ml-0.5 after:text-red-500 duration-300">Start date</label>
+                                    {state.errors?.startDate && state.errors.startDate.map((error: string) => (
+                                        <p className="text-xs text-red-700 mt-2" key={error}>{error}</p>
+                                    ))}
                                 </div>
                                 <div className="relative grow flex flex-col">
                                     <input type="date" id="end_date" value={endDate} className="block w-full py-2 px-0.5 text-sm text-gray-950 bg-transparent border-1 border-l-0 border-r-0 border-t-0 border-gray-500 focus:outline-none focus:ring-0 focus:border-violet-800 disabled:bg-gray-100 disabled:rounded-sm disabled:cursor-not-allowed transition-colors duration-300 peer" placeholder=" " required disabled/>
                                     <label htmlFor="end_date" className="absolute text-sm text-gray-500 transform -translate-y-6 scale-75 top-4 left-0.5 origin-top-left z-10 peer-focus:start-0 peer-focus:text-violet-800 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-2 peer-focus:scale-75 peer-focus:-translate-y-6 peer-focus:left-0.5 peer-disabled:bg-white peer-disabled:px-2 peer-disabled:rounded-full after:content-['*'] after:ml-0.5 after:text-red-500 duration-300">End date</label>
+                                    {state.errors?.endDate && state.errors.endDate.map((error: string) => (
+                                        <p className="text-xs text-red-700 mt-2" key={error}>{error}</p>
+                                    ))}
                                 </div>
                             </div>
                         </div>
                         <button type="submit" className="w-full text-violet-50 text-sm font-bold bg-gray-950 py-4 px-2 rounded-md hover:bg-violet-800 transition-colors duration-300">Submit</button>
-                        {/* <div className="flex flex-col">
+                        <div className="flex flex-col">
                             {state.message && (
                                 <p className="text-xs text-red-700">{state.message}</p>
                             )}
-                            {state.errors?.questions?.generalError && state.errors.questions.generalError.map((error: string) => (
+                            {state.errors?.games && state.errors.games.map((error: string) => (
                                 <p className="text-xs text-red-700 mt-2" key={error}>{error}</p>
                             ))}
-                        </div> */}
+                        </div>
                     </div>
                 </div>
                 <div className="flex flex-col gap-y-4 py-8 lg:px-8 lg:py-0">
