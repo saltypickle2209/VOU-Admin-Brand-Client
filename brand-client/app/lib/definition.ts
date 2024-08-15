@@ -31,3 +31,13 @@ export type Game = {
     voucher: string,
     amount: string
 }
+
+export type Event = {
+    id: string,
+    poster: string,
+    name: string,
+    description: string,
+    start_date: string,
+    end_date: string,
+    games: Game[]
+}
