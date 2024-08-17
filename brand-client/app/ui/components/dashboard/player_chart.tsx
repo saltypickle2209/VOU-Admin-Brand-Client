@@ -1,8 +1,4 @@
-'use client'
-
-import dynamic from "next/dynamic"
-import { useState, useEffect } from "react"
-const Chart = dynamic(() => import("react-apexcharts"), { ssr:false })
+import AreaChart from "../area_chart"
 
 export default function PlayerChart() {
     // fake data fetch
@@ -86,19 +82,13 @@ export default function PlayerChart() {
       },
     ]
 
-    const [isClient, setIsClient] = useState(false)
-
-    useEffect(() => {
-      setIsClient(true)
-    }, [])
-
     return (
-        <div className="flex flex-col w-full h-auto space-y-4 p-6 bg-white rounded-md shadow-md xl:w-3/5">
-            <div className="flex flex-col space-y-1">
+        <div className="flex flex-col w-full h-auto gap-y-4 p-6 bg-white rounded-md shadow-md xl:w-3/5">
+            <div className="flex flex-col gap-y-1">
                 <p className="text-sm text-gray-500">Player count this month</p>
-                <p className="text-3xl font-extrabold text-gray-950">{isClient && data.reduce((acc, curr) => acc + curr, 0)}</p>
+                <p className="text-3xl font-bold text-gray-950">{data.reduce((acc, curr) => acc + curr, 0)}</p>
             </div>
-            <Chart options={options} series={series} type="area" height={250}/>
+            <AreaChart series={series} categories={categories}/>
         </div>
     )
 }

@@ -9,7 +9,7 @@ export default function SideNav() {
             <Link href="/dashboard" className="mb-2 flex h-20 items-center justify-start rounded-md bg-violet-600 p-4 md:h-40 md:items-end">
                 <Image src="/vou_large_icon_white.png" width={142} height={53.333} alt="App Icon" className="scale-75 md:scale-100"/>
             </Link>
-            <div className="flex grow flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2">
+            <div className="flex grow flex-row justify-between gap-x-2 md:flex-col md:gap-x-0 md:gap-y-2">
                 <NavLinks/>
                 <div className="hidden h-auto w-full grow rounded-md bg-gray-50 md:block"></div>
                 <form>

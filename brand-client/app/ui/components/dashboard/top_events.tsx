@@ -26,10 +26,10 @@ const data = [
 
 export default function TopEvents() {
     return (
-        <div className="flex flex-col w-full space-y-4 p-6 bg-white rounded-md shadow-md">
+        <div className="flex flex-col w-full gap-y-4 p-6 bg-white rounded-md shadow-md">
             <div className="flex justify-between items-center">
-                <p className="text-xl text-gray-950 font-extrabold">Top events</p>
-                <Link href="/events" className="flex items-center shrink-0 space-x-2 font-bold text-violet-500 hover:text-violet-800 transition-colors duration-300">
+                <p className="text-xl text-gray-950 font-bold">Top events</p>
+                <Link href="/events" className="flex items-center shrink-0 gap-x-2 font-bold text-violet-500 hover:text-violet-800 transition-colors duration-300">
                     <p>View all</p>
                     <ChevronRightIcon className="w-5"/>
                 </Link>
