@@ -656,3 +656,173 @@ export async function updateEvent(prevState: EventFormState, formData: FormData)
         redirect("/events")
     }
 }
+
+const loginSchema = z.object({
+    username: z.string({
+        required_error: "Username is required",
+        invalid_type_error: "Username must be a string"
+    }).trim().min(1, { 
+        message: "Username can't be a whitespace string" 
+    }),
+    password: z.string({
+        required_error: "Password is required",
+        invalid_type_error: "Password must be a string"
+    }).trim().min(1, { 
+        message: "Password can't be a whitespace string" 
+    })
+})
+
+export type LoginFormState = {
+    errors?: {
+        username?: string[],
+        password?: string[]
+    },
+    message?: string | null
+}
+
+export async function logIn(prevState: LoginFormState, formData: FormData): Promise<LoginFormState>{
+    const validateFields = loginSchema.safeParse({
+        username: formData.get('username'),
+        password: formData.get('password')
+    })
+
+    if(!validateFields.success) {
+        const errors = validateFields.error.flatten().fieldErrors
+        console.log("-------------------------------------")
+        console.log(errors)
+        console.log("-------------------------------------")
+
+        return {
+            errors: errors,
+            message: "Invalid Form. Try filling it in correctly and submit again."
+        }
+    }
+    else {
+        console.log("Passed validation")
+
+        // Pack data and send to express server
+        // Get a token and store it somewhere
+
+        revalidatePath("/dashboard")
+        redirect("/dashboard")
+    }
+}
+
+const registerSchema = z.object({
+    name: z.string({
+        required_error: "Name is required",
+        invalid_type_error: "Name must be a string"
+    }).trim().min(1, { 
+        message: "Name can't be a whitespace string" 
+    }).max(200, {
+        message: "Name's length cannot exceed 200 characters"
+    }),
+    domain: z.string({
+        required_error: "Domain is required",
+        invalid_type_error: "Domain must be a string"
+    }).trim().min(1, { 
+        message: "Domain can't be a whitespace string" 
+    }).max(200, {
+        message: "Domain's length cannot exceed 200 characters"
+    }),
+    address: z.string({
+        required_error: "Address is required",
+        invalid_type_error: "Address must be a string"
+    }).trim().min(1, { 
+        message: "Address can't be a whitespace string" 
+    }).max(200, {
+        message: "Address's length cannot exceed 200 characters"
+    }),
+    latitude: z.coerce.number({
+        required_error: "Latitude is required",
+        invalid_type_error: "Latitude must be a number"
+    }).gte(-90, "Latitude must be between -90 and 90").lte(90, "Latitude must be between -90 and 90"),
+    longitude: z.coerce.number({
+        required_error: "Longitude is required",
+        invalid_type_error: "Longitude must be a number"
+    }).gte(-180, "Longitude must be between -180 and 180").lte(180, "Latitude must be between -180 and 180"),
+    username: z.string({
+        required_error: "Username is required",
+        invalid_type_error: "Username must be a string"
+    }).trim().regex(/^\S*$/, {
+        message: "Username must not contain any whitespace"
+    }).min(1, { 
+        message: "Username can't be a whitespace string" 
+    }).max(200, {
+        message: "Username's length cannot exceed 200 characters"
+    }),
+    email: z.string({
+        required_error: "Email is required",
+        invalid_type_error: "Email must be a string"
+    }).trim().min(1, { 
+        message: "Email can't be a whitespace string" 
+    }).max(200, {
+        message: "Email's length cannot exceed 200 characters"
+    }).email("Invalid email format"),
+    password: z.string({
+        required_error: "Password is required",
+        invalid_type_error: "Password must be a string"
+    }).trim().min(1, { 
+        message: "Password can't be a whitespace string" 
+    }).max(200, {
+        message: "Password's length cannot exceed 200 characters"
+    }).regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/, {
+        message: "Password must contain at least one uppercase character, one lowercase character, one number and one special character"
+    }),
+    confirmPassword: z.string({
+        required_error: "Confirm password is required",
+        invalid_type_error: "Confirm password must be a string"
+    })
+}).refine(data => data.password === data.confirmPassword, {
+    message: "Confirm password does not match with password",
+    path: ["confirmPassword"]
+})
+
+export type RegisterFormState = {
+    errors?: {
+        name?: string[],
+        domain?: string[],
+        address?: string[],
+        latitude?: string[],
+        longitude?: string[],
+        username?: string[],
+        email?: string[],
+        password?: string[],
+        confirmPassword?: string[]
+    },
+    message?: string | null
+}
+
+export async function register(prevState: RegisterFormState, formData: FormData): Promise<RegisterFormState>{
+    const validateFields = registerSchema.safeParse({
+        name: formData.get('name'),
+        domain: formData.get('domain'),
+        address: formData.get('address'),
+        latitude: formData.get('latitude'),
+        longitude: formData.get('longitude'),
+        username: formData.get('username'),
+        email: formData.get('email'),
+        password: formData.get('password'),
+        confirmPassword: formData.get('confirmPassword')
+    })
+
+    if(!validateFields.success) {
+        const errors = validateFields.error.flatten().fieldErrors
+        console.log("-------------------------------------")
+        console.log(errors)
+        console.log("-------------------------------------")
+
+        return {
+            errors: errors,
+            message: "Invalid Form. Try filling it in correctly and submit again."
+        }
+    }
+    else {
+        console.log("Passed validation")
+
+        // Pack data and send to express server
+
+        revalidatePath("/login")
+        redirect("/login")
+    }
+}

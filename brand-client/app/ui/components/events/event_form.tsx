@@ -35,15 +35,13 @@ export default function EventForm() {
         }
     }
 
-    const handleAddGames = (newGames: Game[]) => {
-        setGames(newGames)
-
-        if(newGames.length === 0) {
+    function updateStartEndDate (gameList: Game[]) {
+        if(gameList.length === 0) {
             setStartDate('')
             setEndDate('')
         }
         else {
-            const minStartDateItem = newGames.reduce((min: Game, current: Game) => {
+            const minStartDateItem = gameList.reduce((min: Game, current: Game) => {
                 const minDate = new Date(min.start_date)
                 const currentDate = new Date(current.start_date)
     
@@ -51,7 +49,7 @@ export default function EventForm() {
             })
             setStartDate(minStartDateItem.start_date)
     
-            const maxEndDateItem = newGames.reduce((max: Game, current: Game) => {
+            const maxEndDateItem = gameList.reduce((max: Game, current: Game) => {
                 const maxDate = new Date(max.end_date)
                 const currentDate = new Date(current.end_date)
     
@@ -61,8 +59,15 @@ export default function EventForm() {
         }
     }
 
+    const handleAddGames = (newGames: Game[]) => {
+        setGames(newGames)
+        updateStartEndDate(newGames)
+    }
+
     const handleRemoveGame = (index: number) => {
-        setGames(games.filter((_, i) => i !== index))
+        const newGames = games.filter((_, i) => i !== index)
+        setGames(newGames)
+        updateStartEndDate(newGames)
     }
 
     const handleSubmit = async (event: FormEvent) => {

@@ -29,7 +29,7 @@ export default function EventEditForm({
     const [eventDescription, setEventDescription] = useState<string>(data.description)
     const [startDate, setStartDate] = useState<string>(data.start_date)
     const [endDate, setEndDate] = useState<string>(data.end_date)
-    const [games, setGames] = useState<Game[]>(data.games)
+    const [games, setGames] = useState<Game[]>([])
 
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
 
@@ -39,15 +39,13 @@ export default function EventEditForm({
         }
     }
 
-    const handleAddGames = (newGames: Game[]) => {
-        setGames(newGames)
-
-        if(newGames.length === 0) {
+    function updateStartEndDate (gameList: Game[]) {
+        if(gameList.length === 0) {
             setStartDate('')
             setEndDate('')
         }
         else {
-            const minStartDateItem = newGames.reduce((min: Game, current: Game) => {
+            const minStartDateItem = gameList.reduce((min: Game, current: Game) => {
                 const minDate = new Date(min.start_date)
                 const currentDate = new Date(current.start_date)
     
@@ -55,7 +53,7 @@ export default function EventEditForm({
             })
             setStartDate(minStartDateItem.start_date)
     
-            const maxEndDateItem = newGames.reduce((max: Game, current: Game) => {
+            const maxEndDateItem = gameList.reduce((max: Game, current: Game) => {
                 const maxDate = new Date(max.end_date)
                 const currentDate = new Date(current.end_date)
     
@@ -65,8 +63,15 @@ export default function EventEditForm({
         }
     }
 
+    const handleAddGames = (newGames: Game[]) => {
+        setGames(newGames)
+        updateStartEndDate([...data.games, ...newGames])
+    }
+
     const handleRemoveGame = (index: number) => {
-        setGames(games.filter((_, i) => i !== index))
+        const newGames = games.filter((_, i) => i !== index)
+        setGames(newGames)
+        updateStartEndDate([...data.games, ...newGames])
     }
 
     const handleSubmit = async (event: FormEvent) => {
@@ -78,7 +83,7 @@ export default function EventEditForm({
         formData.append('description', eventDescription)
         formData.append('startDate', startDate)
         formData.append('endDate', endDate)
-        formData.append('games', JSON.stringify(games))
+        formData.append('games', JSON.stringify([...data.games, ...games]))
 
         formAction(formData)
     }
@@ -175,6 +180,32 @@ export default function EventEditForm({
                         <QueueListIcon className="w-5"/>
                         <h2 className="font-semibold">Games</h2>
                     </div>
+                    {data.games.map((game, index) => {
+                        return (
+                            <div key={index} className="w-full flex rounded-md shadow-md overflow-hidden gap-x-4">
+                                <div className="flex w-2/5 bg-slate-50 overflow-hidden shrink-0 md:w-1/3">
+                                    <img src={game.poster} alt="" className="object-cover w-full h-full"/>
+                                </div>
+                                <div className="p-4 pl-0 flex flex-col gap-y-2 flex-1 overflow-hidden justify-center">
+                                    <p className="text-gray-950 font-bold break-words line-clamp-2">{game.name}</p>
+                                    <p className="text-xs text-gray-500 line-clamp-3">{game.description}</p>
+                                    <div className="flex gap-x-2 items-center">
+                                        <CalendarDaysIcon className="w-5 text-gray-500 shrink-0"/>
+                                        <div className="flex-1 overflow-hidden flex flex-col gap-y-1 justify-between sm:flex-row sm:gap-x-2 sm:gap-y-0">
+                                            <div className="flex truncate flex-col items-start">
+                                                <p className="text-xs font-light text-gray-500">From</p>
+                                                <p className="text-xs font-semibold text-gray-700">{formatDate(game.start_date)}</p>
+                                            </div>
+                                            <div className="flex truncate flex-col items-start">
+                                                <p className="text-xs font-light text-gray-500">to</p>
+                                                <p className="text-xs font-semibold text-gray-700 text-elipsis">{formatDate(game.end_date)}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )
+                    })}
                     {games.map((game, index) => {
                         return (
                             <div key={index} className="w-full flex rounded-md shadow-md overflow-hidden gap-x-4">
