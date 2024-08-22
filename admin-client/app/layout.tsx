@@ -3,7 +3,10 @@ import { inter } from '@/app/ui/fonts'
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "VOU Admin Client",
+  title: {
+    template: '%s | VOU Admin Client',
+    default: 'VOU Admin Client'
+  },
   description: "VOU client for admins",
 };
 
