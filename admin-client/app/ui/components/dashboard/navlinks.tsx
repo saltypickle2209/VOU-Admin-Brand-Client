@@ -11,7 +11,7 @@ import clsx from 'clsx';
 
 const links = [
     { name: 'Dashboard', href: '/dashboard', icon: RectangleGroupIcon },
-    { name: 'Users', href: '/events', icon: UserGroupIcon },
+    { name: 'Users', href: '/users', icon: UserGroupIcon },
     { name: 'Game config', href: '/gamedata', icon: WrenchScrewdriverIcon }
 ];
 

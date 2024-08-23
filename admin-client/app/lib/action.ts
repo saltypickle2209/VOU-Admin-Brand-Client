@@ -9,6 +9,11 @@ export async function revalidateDashboard() {
     redirect('/dashboard')
 }
 
+export async function revalidateUsers() {
+    revalidatePath('/users')
+    redirect('/users')
+}
+
 const loginSchema = z.object({
     username: z.string({
         required_error: "Username is required",
