@@ -8,15 +8,15 @@ import clsx from 'clsx';
 import { useFormState } from 'react-dom';
 import { User } from '@/app/lib/definition';
 import { ChangeEvent, FormEvent, useState, MouseEvent } from 'react';
-import { editUser, toggleUserActivation, UserEditFormState } from '@/app/lib/action';
+import { BrandEditFormState, editBrand, toggleUserActivation } from '@/app/lib/action';
 
-export default function UserEditForm({
+export default function BrandEditForm({
     data
 }: {
     data: User
 }) {
-    const initialState: UserEditFormState = { message: null, errors: {} }
-    const [state, formAction] = useFormState(editUser, initialState)
+    const initialState: BrandEditFormState = { message: null, errors: {} }
+    const [state, formAction] = useFormState(editBrand, initialState)
 
     const [avatar, setAvatar] = useState<File | string | null>(data.avatar)
     const [name, setName] = useState<string>(data.name)
@@ -24,8 +24,10 @@ export default function UserEditForm({
     const [email, setEmail] = useState<string>(data.email)
     const [phone, setPhone] = useState<string>(data.phone)
     const [role, setRole] = useState<string>(data.role)
-    const [dob, setDob] = useState<string | undefined>(data.dob)
-    const [gender, setGender] = useState<string | undefined>(data.gender)
+    const [domain, setDomain] = useState<string | undefined>(data.domain)
+    const [address, setAddress] = useState<string | undefined>(data.address)
+    const [latitude, setLatitude] = useState<string | undefined>(data.latitude)
+    const [longitude, setLongitude] = useState<string | undefined>(data.longitude)
 
     const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
         if(event.target.files && event.target.files[0]){
@@ -44,8 +46,10 @@ export default function UserEditForm({
         formData.append('email', email)
         formData.append('phone', phone)
         formData.append('role', role)
-        if(dob) formData.append('dob', dob)
-        if(gender) formData.append('gender', gender)  
+        if(domain) formData.append('domain', domain)
+        if(address) formData.append('address', address)  
+        if(latitude) formData.append('latitude', latitude) 
+        if(longitude) formData.append('longitude', longitude) 
 
         formAction(formData)
     }
@@ -59,7 +63,7 @@ export default function UserEditForm({
             <div className="flex flex-col gap-y-4 py-8 lg:px-8 lg:py-0">
                 <div className="flex gap-x-2 text-gray-950">
                     <InformationCircleIcon className="w-5"/>
-                    <h2 className="font-semibold">User Information</h2>
+                    <h2 className="font-semibold">Brand Information</h2>
                 </div>
                 <div className="flex flex-col">
                     <label htmlFor="avatar" className={ clsx(
@@ -127,24 +131,33 @@ export default function UserEditForm({
                         <p className="text-xs text-red-700 mt-2" key={error}>{error}</p>
                     ))}
                 </div>
+                <div className="relative mt-2 flex flex-col">
+                    <input type="text" id="domain" value={domain} className="block w-full py-2 px-0.5 text-sm text-gray-950 bg-transparent border-1 border-l-0 border-r-0 border-t-0 border-gray-500 focus:outline-none focus:ring-0 focus:border-violet-800 transition-colors duration-300 peer" placeholder=" " required onChange={(e) => setDomain(e.target.value)}/>
+                    <label htmlFor="domain" className="absolute text-sm text-gray-500 transform -translate-y-6 scale-75 top-4 left-0.5 origin-top-left z-10 peer-focus:start-0 peer-focus:text-violet-800 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-2 peer-focus:scale-75 peer-focus:-translate-y-6 peer-focus:left-0.5 after:content-['*'] after:ml-0.5 after:text-red-500 duration-300">Domain</label>
+                    {state.errors?.domain && state.errors.domain.map((error: string) => (
+                        <p className="text-xs text-red-700 mt-2" key={error}>{error}</p>
+                    ))}
+                </div>
+                <div className="relative mt-2 flex flex-col">
+                    <input type="text" id="address" value={address} className="block w-full py-2 px-0.5 text-sm text-gray-950 bg-transparent border-1 border-l-0 border-r-0 border-t-0 border-gray-500 focus:outline-none focus:ring-0 focus:border-violet-800 transition-colors duration-300 peer" placeholder=" " required onChange={(e) => setAddress(e.target.value)}/>
+                    <label htmlFor="address" className="absolute text-sm text-gray-500 transform -translate-y-6 scale-75 top-4 left-0.5 origin-top-left z-10 peer-focus:start-0 peer-focus:text-violet-800 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-2 peer-focus:scale-75 peer-focus:-translate-y-6 peer-focus:left-0.5 after:content-['*'] after:ml-0.5 after:text-red-500 duration-300">Address</label>
+                    {state.errors?.address && state.errors.address.map((error: string) => (
+                        <p className="text-xs text-red-700 mt-2" key={error}>{error}</p>
+                    ))}
+                </div>
                 <div className="flex gap-x-4 mt-2">
                     <div className="relative w-1/2 flex flex-col">
-                        <input type="date" id="dob" value={dob} className="block w-full py-2 px-0.5 text-sm text-gray-950 bg-transparent border-1 border-l-0 border-r-0 border-t-0 border-gray-500 focus:outline-none focus:ring-0 focus:border-violet-800 transition-colors duration-300 peer" placeholder=" " required onChange={(e) => setDob(e.target.value)}/>
-                        <label htmlFor="dob" className="absolute text-sm text-gray-500 transform -translate-y-6 scale-75 top-4 left-0.5 origin-top-left z-10 peer-focus:start-0 peer-focus:text-violet-800 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-2 peer-focus:scale-75 peer-focus:-translate-y-6 peer-focus:left-0.5 after:content-['*'] after:ml-0.5 after:text-red-500 duration-300">Date of birth</label>
-                        {state.errors?.dob && state.errors.dob.map((error: string) => (
-                            <p className="text-xs text-red-700 mt-2" key={error}>{error}</p>
+                        <input type="number" id="latitude" value={latitude} className="block w-full py-2 px-0.5 text-sm text-gray-950 bg-transparent border-1 border-l-0 border-r-0 border-t-0 border-gray-500 focus:outline-none focus:ring-0 focus:border-violet-800 transition-colors duration-300 peer" placeholder=" " required onChange={(e) => setLatitude(e.target.value)}/>
+                        <label htmlFor="latitude" className="absolute text-sm text-gray-500 transform -translate-y-6 scale-75 top-4 left-0.5 origin-top-left z-10 peer-focus:start-0 peer-focus:text-violet-800 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-2 peer-focus:scale-75 peer-focus:-translate-y-6 peer-focus:left-0.5 after:content-['*'] after:ml-0.5 after:text-red-500 duration-300">Latitude</label>
+                        {state.errors?.latitude && state.errors.latitude.map((error: string) => (
+                        <p className="text-xs text-red-700 mt-2" key={error}>{error}</p>
                         ))}
                     </div>
                     <div className="relative w-1/2 flex flex-col">
-                        <select id="gender" value={gender} className="block w-full py-2 px-0.5 text-sm text-gray-950 bg-transparent border-1 border-l-0 border-r-0 border-t-0 border-gray-500 focus:outline-none focus:ring-0 focus:border-violet-800 transition-colors duration-300 peer" required onChange={(e) => setGender(e.target.value)}>
-                            <option value="">Select a gender</option>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                            <option value="other">Other</option>
-                        </select>
-                        <label htmlFor="gender" className="absolute text-sm text-gray-500 transform -translate-y-6 scale-75 top-4 left-0.5 origin-top-left z-10 peer-focus:text-violet-800 after:content-['*'] after:ml-0.5 after:text-red-500 duration-300">Gender</label>
-                        {state.errors?.gender && state.errors.gender.map((error: string) => (
-                            <p className="text-xs text-red-700 mt-2" key={error}>{error}</p>
+                        <input type="number" id="longitude" value={longitude} className="block w-full py-2 px-0.5 text-sm text-gray-950 bg-transparent border-1 border-l-0 border-r-0 border-t-0 border-gray-500 focus:outline-none focus:ring-0 focus:border-violet-800 transition-colors duration-300 peer" placeholder=" " required onChange={(e) => setLongitude(e.target.value)}/>
+                        <label htmlFor="longitude" className="absolute text-sm text-gray-500 transform -translate-y-6 scale-75 top-4 left-0.5 origin-top-left z-10 peer-focus:start-0 peer-focus:text-violet-800 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-2 peer-focus:scale-75 peer-focus:-translate-y-6 peer-focus:left-0.5 after:content-['*'] after:ml-0.5 after:text-red-500 duration-300">Longitude</label>
+                        {state.errors?.longitude && state.errors.longitude.map((error: string) => (
+                        <p className="text-xs text-red-700 mt-2" key={error}>{error}</p>
                         ))}
                     </div>
                 </div>

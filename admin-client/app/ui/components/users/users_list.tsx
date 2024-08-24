@@ -5,6 +5,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { User } from "@/app/lib/definition";
 import clsx from 'clsx';
+import DeleteUserButton from "./delete_user_button";
 
 const data: User[] = [
     {
@@ -66,6 +67,7 @@ const data: User[] = [
 
 export default function UsersList({ query, currentPage }: { query: string, currentPage: number }){
     // fetch data using query & currentPage
+    
     return (
         <div className="flex flex-col divide-y-2 divide-gray-300">
             <div className="hidden items-center md:grid md:grid-cols-9">
@@ -118,13 +120,11 @@ export default function UsersList({ query, currentPage }: { query: string, curre
                                 {user.status === "active" ? "Active" : "Inactive"}
                             </div>
                         </div>
-                        <div className="flex gap-x-4 justify-end items-end pl-2 col-span-1 md:gap-x-2 lg:gap-x-4">
+                        <div className="flex gap-x-4 justify-end items-center pl-2 col-span-1 md:gap-x-2 lg:gap-x-4">
                             <Link href={`/users/edit/${user.id}`} className="text-gray-950 hover:text-violet-800 transition-colors duration-300">
                                 <PencilSquareIcon className="w-5"/>
                             </Link>
-                            <Link href="/" className="text-gray-950 hover:text-red-700 transition-colors duration-300">
-                                <TrashIcon className="w-5"/>
-                            </Link>
+                            <DeleteUserButton userId={user.id} />
                         </div>
                     </div>
                 )
