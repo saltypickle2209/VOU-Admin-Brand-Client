@@ -10,7 +10,7 @@ import {
 } from '@heroicons/react/24/solid';
 import Link from 'next/link';
 
-export default function EventDetail() {
+export default function EventDetail({ eventId }: { eventId: string }) {
     return (
         <div className="w-full px-6 grid grid-cols-1 divide-y-2 divide-gray-300 lg:py-6 lg:px-0 lg:divide-y-0 lg:divide-x-2 lg:grid-cols-[minmax(0,_2fr)_minmax(0,_1fr)] bg-white rounded-md shadow-md">
             <div className="flex flex-col gap-y-4 py-8 lg:px-8 lg:py-0">
@@ -92,7 +92,7 @@ export default function EventDetail() {
                         </Link>
                     </div>
                 </div>
-                <Link href="/" className="w-full mt-2 text-center text-violet-50 text-sm font-bold bg-gray-950 py-4 px-2 rounded-md hover:bg-violet-800 transition-colors duration-300">Edit</Link>
+                <Link href={`/events/edit/${eventId}`} className="w-full mt-2 text-center text-violet-50 text-sm font-bold bg-gray-950 py-4 px-2 rounded-md hover:bg-violet-800 transition-colors duration-300">Edit</Link>
             </div>
             <div className="relative w-full h-full">
                 <div className="sticky top-0 flex flex-col gap-y-4 py-8 lg:px-8 lg:py-0">

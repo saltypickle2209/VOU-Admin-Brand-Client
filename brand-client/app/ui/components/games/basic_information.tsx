@@ -3,7 +3,7 @@ import {
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 
-export default function BasicInformation() {
+export default function BasicInformation({ gameId }: { gameId: string }) {
     return (
         <div className="relative w-full h-full">
             <div className="sticky top-0 flex flex-col gap-y-4 py-8 lg:px-8 lg:py-0">
@@ -45,10 +45,7 @@ export default function BasicInformation() {
                         </div>
                     </div>
                 </div>
-                <div className="grid grid-cols-2 gap-x-4 mt-2">
-                    <button className="w-full text-center text-gray-950 text-sm font-bold bg-transparent border-2 border-gray-950 py-4 px-2 rounded-md hover:border-red-700 hover:text-red-700 transition-colors duration-300">Delete</button>
-                    <Link href="/" className="w-full text-center text-violet-50 text-sm font-bold bg-gray-950 py-4 px-2 rounded-md hover:bg-violet-800 transition-colors duration-300">Edit</Link>
-                </div>
+                <Link href={`/games/edit/${gameId}`} className="w-full mt-2 text-center text-violet-50 text-sm font-bold bg-gray-950 py-4 px-2 rounded-md hover:bg-violet-800 transition-colors duration-300">Edit</Link>
             </div> 
         </div>
     )
