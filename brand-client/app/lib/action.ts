@@ -826,3 +826,53 @@ export async function register(prevState: RegisterFormState, formData: FormData)
         redirect("/login")
     }
 }
+
+export async function generatePostQuestionComment(question: string): Promise<string>{
+    const prompt = `Help me write a lively comment for this question: "${question}". Note that the answer for this question mustn't be mentioned, the comment must be no longer than 2 sentences or 500 characters and do not enclose the comment in quotation marks.`
+
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+            "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            "model": "qwen/qwen-2-7b-instruct:free",
+            "messages": [
+                { "role": "user", "content": prompt },
+            ],
+        })
+    })
+
+    if(!response.ok){
+        return `${response.status}`
+    }
+
+    const data = await response.json()
+    return data.choices[0].message.content.trim();
+}
+
+export async function generateAnswerComment(question: string, answers: string[], correctAnswer: string): Promise<string>{
+    const prompt = `The question is "${question}". The answers for it include ${answers.join(', ')}. And the correct answer is ${answers[Number(correctAnswer)]}. Help me write a comment for this answer. Note that the comment must be no longer than 2 sentences or 500 characters and do not enclose the comment in quotation marks.`
+
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+            "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            "model": "qwen/qwen-2-7b-instruct:free",
+            "messages": [
+                { "role": "user", "content": prompt },
+            ],
+        })
+    })
+
+    if(!response.ok){
+        return `${response.status}`
+    }
+
+    const data = await response.json()
+    return data.choices[0].message.content.trim();
+}

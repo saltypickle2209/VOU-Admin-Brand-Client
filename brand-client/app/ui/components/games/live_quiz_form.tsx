@@ -9,9 +9,10 @@ import {
 } from '@heroicons/react/24/outline';
 import { ChangeEvent, FormEvent, useState } from 'react';
 import clsx from 'clsx';
-import { createLiveQuiz, LiveQuizFormState } from '@/app/lib/action';
+import { createLiveQuiz, generateAnswerComment, generatePostQuestionComment, LiveQuizFormState } from '@/app/lib/action';
 import { useFormState } from 'react-dom';
 import { Question } from '@/app/lib/definition';
+import { boolean } from 'zod';
 
 // remember to add voucher list props
 export default function LiveQuizForm() {
@@ -26,6 +27,8 @@ export default function LiveQuizForm() {
     const [startDate, setStartDate] = useState<string>('')
     const [endDate, setEndDate] = useState<string>('')
     const [questions, setQuestions] = useState<Question[]>([])
+    const [canGenerate, setCanGenerate] = useState<boolean[]>([])
+    const [isGenerating, setIsGenerating] = useState<boolean[]>([])
 
     const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
         if(event.target.files && event.target.files[0]){
@@ -36,7 +39,12 @@ export default function LiveQuizForm() {
     const handleQuestionChange = (index: number, field: keyof Question, value: string) => {
         const updatedQuestions = [...questions]
         updatedQuestions[index] = { ...updatedQuestions[index], [field]: value }
+
+        const updatedCanGenerate = [...canGenerate]
+        updatedCanGenerate[index] = checkQuestionAtIndex(updatedQuestions, index)
+
         setQuestions(updatedQuestions)
+        setCanGenerate(updatedCanGenerate)
     }
 
     const handleAddQuestion = () => {
@@ -53,10 +61,68 @@ export default function LiveQuizForm() {
                 scriptAnswer: ''
             }
         ])
+        setCanGenerate([
+            ...canGenerate,
+            false
+        ])
+        setIsGenerating([
+            ...isGenerating,
+            false
+        ])
     }
 
     const handleRemoveQuestion = (index: number) => {
         setQuestions(questions.filter((_, i) => i !== index))
+        setCanGenerate(canGenerate.filter((_, i) => i !== index))
+        setIsGenerating(isGenerating.filter((_, i) => i !== index))
+    }
+
+    const checkQuestionAtIndex = (questions: Question[], index: number): boolean => {
+        const question = questions[index]
+        if(question.question.trim().length === 0)
+            return false
+        if(question.answerA.trim().length === 0 || question.answerB.trim().length === 0 || question.answerC.trim().length === 0 || question.answerD.trim().length === 0)
+            return false
+        if(!["0", "1", "2", "3"].includes(question.correctAnswer))
+            return false
+        return true
+    }
+
+    const handleGenerateComments = async (index: number) => {
+        if(checkQuestionAtIndex(questions, index)) {
+            setIsGenerating(prevIsGenerating => {
+                const updatedIsGenerating = [...prevIsGenerating];
+                updatedIsGenerating[index] = true;
+                return updatedIsGenerating;
+            })
+
+            const question = questions[index]
+            try {
+                const [postQuestionComment, answerComment] = await Promise.all([
+                    generatePostQuestionComment(question.question),
+                    generateAnswerComment(question.question, [question.answerA, question.answerB, question.answerC, question.answerD], question.correctAnswer)
+                ])
+
+                setQuestions(prevQuestions => {
+                    const updatedQuestions = [...prevQuestions];
+                    updatedQuestions[index] = { 
+                        ...updatedQuestions[index], 
+                        scriptPostQuestion: postQuestionComment,
+                        scriptAnswer: answerComment 
+                    };
+                    return updatedQuestions;
+                })
+            } catch (error) {
+                console.log("Error occured while fetching comments.")
+                return
+            } finally {
+                setIsGenerating(prevIsGenerating => {
+                    const updatedIsGenerating = [...prevIsGenerating];
+                    updatedIsGenerating[index] = false;
+                    return updatedIsGenerating;
+                })
+            }
+        }
     }
 
     const handleSubmit = async (event: FormEvent) => {
@@ -230,9 +296,23 @@ export default function LiveQuizForm() {
                         </div>
 
                         <p className="text-xs text-gray-500">You can let our AI generate the below fields by clicking on this button, or type them on your own.</p>
-                        <button type="button" className="w-full text-violet-50 text-sm font-bold bg-gray-950 py-4 px-2 rounded-md hover:bg-violet-800 transition-colors duration-300">
-                            Generate comments
-                        </button>
+                        {canGenerate[index] && !isGenerating[index] ? (
+                            <button type="button" className="w-full text-violet-50 text-sm font-bold bg-gray-950 py-4 px-2 rounded-md hover:bg-violet-800 transition-colors duration-300" onClick={() => handleGenerateComments(index)}>
+                                Generate comments
+                            </button>
+                        ) : isGenerating[index] ? (
+                            <div className="cursor-not-allowed w-full flex items-center justify-center gap-x-4 text-violet-50 text-sm font-bold bg-gray-500 py-4 px-2 rounded-md" onClick={() => handleGenerateComments(index)}>
+                                <span className="relative flex h-4 w-4">
+                                    <span className="animate-ping absolute w-full h-full rounded-full bg-violet-50 opacity-75"/>
+                                    <span className="relative inline-flex rounded-full w-4 h-4 bg-violet-50 opacity-75"/>
+                                </span>
+                                <span>Generating...</span>
+                            </div>
+                        ) : (
+                            <div className="cursor-not-allowed w-full flex items-center justify-center text-violet-50 text-sm font-bold bg-gray-500 py-4 px-2 rounded-md" onClick={() => handleGenerateComments(index)}>
+                                Generate comments
+                            </div>
+                        )}
                         <div className="relative mt-2 flex flex-col">
                             <textarea id={`question_comment_${index}`} maxLength={500} rows={8} value={question.scriptPostQuestion} className="resize-none block w-full p-2 text-sm text-gray-950 bg-transparent rounded-md border-1 border-gray-500 focus:outline-none focus:ring-0 focus:border-violet-800 transition-colors duration-300 peer" placeholder=" " required onChange={(e) => handleQuestionChange(index, 'scriptPostQuestion', e.target.value)}/>
                             <label htmlFor={`question_comment_${index}`} className="absolute bg-white px-2 rounded-full text-sm text-gray-500 transform -translate-y-6 scale-75 top-4 left-0.5 origin-top-left z-10 peer-focus:start-0 peer-focus:text-violet-800 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-2 peer-focus:scale-75 peer-focus:-translate-y-6 peer-focus:left-0.5 after:content-['*'] after:ml-0.5 after:text-red-500 duration-300">Post-question comment</label>
