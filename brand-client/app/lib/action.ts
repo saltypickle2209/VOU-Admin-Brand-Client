@@ -749,12 +749,12 @@ export async function updateEvent(prevState: EventFormState, formData: FormData)
 }
 
 const loginSchema = z.object({
-    username: z.string({
+    email: z.string({
         required_error: "Username is required",
         invalid_type_error: "Username must be a string"
     }).trim().min(1, { 
         message: "Username can't be a whitespace string" 
-    }),
+    }).email("Invalid email format"),
     password: z.string({
         required_error: "Password is required",
         invalid_type_error: "Password must be a string"
@@ -765,7 +765,7 @@ const loginSchema = z.object({
 
 export type LoginFormState = {
     errors?: {
-        username?: string[],
+        email?: string[],
         password?: string[]
     },
     message?: string | null
@@ -773,7 +773,7 @@ export type LoginFormState = {
 
 export async function logIn(prevState: LoginFormState, formData: FormData): Promise<LoginFormState>{
     const validateFields = loginSchema.safeParse({
-        username: formData.get('username'),
+        email: formData.get('email'),
         password: formData.get('password')
     })
 
@@ -791,34 +791,39 @@ export async function logIn(prevState: LoginFormState, formData: FormData): Prom
     else {
         console.log("Passed validation")
         console.log(`${baseURL}/auth/login`)
-        // Pack data and send to express server
-        const response = await fetch(`${baseURL}/auth/login`, {
-            method: 'POST',
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                "email": formData.get('username'),
-                "password": formData.get('password')
+
+        try{
+            const response = await fetch(`${baseURL}/auth/login`, {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    "email": formData.get('email'),
+                    "password": formData.get('password')
+                })
             })
-        })
+        
+            if(!response.ok){
+                const errorMessage = await response.text()
+                return {
+                    message: errorMessage
+                }
+            }
     
-        if(!response.ok){
-            const errorMessage = await response.text()
+            const data = await response.json()
+            //console.log(data.token)
+            
+            cookies().set('token', data.token, {
+                httpOnly: true,
+                maxAge: 60 * 60
+            })
+        } catch (error) {
             return {
-                message: errorMessage
+                message: "Something went wrong. Try again later."
             }
         }
-
-        const data = await response.json()
-        //console.log(data.token)
         
-        // Get a token and store it somewhere
-        cookies().set('token', data.token, {
-            httpOnly: true,
-            maxAge: 60 * 60
-        })
-
         revalidatePath("/dashboard")
         redirect("/dashboard")
     }
