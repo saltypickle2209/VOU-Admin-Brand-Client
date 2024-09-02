@@ -208,6 +208,14 @@ const liveQuizSchema = z.object({
         message: "Question list can't be empty"
     }).max(10, {
         message: "Question list cannot exceed 10 questions"
+    }),
+    scriptQuizIntroduction: z.string({
+        required_error: "Quiz's introduction is required",
+        invalid_type_error: "Quiz's introduction must be a string"
+    }).trim().min(1, {
+        message: "Quiz's introduction can't be a whitespace string" 
+    }).max(500, {
+        message: "Quiz's introduce is too long" 
     })
 }).refine(data => new Date(data.endDate) > new Date(data.startDate), {
     message: "End date must be later than start date",
@@ -235,7 +243,8 @@ export type LiveQuizFormState = {
                 scriptPostQuestion?: string[],
                 scriptAnswer?: string[]
             }>
-        }
+        },
+        scriptQuizIntroduction?: string[]
     }
     message?: string | null
 }
@@ -263,7 +272,8 @@ export async function createLiveQuiz(prevState: LiveQuizFormState, formData: For
         amount: formData.get('amount'),
         startDate: formData.get('startDate'),
         endDate: formData.get('endDate'),
-        questions: JSON.parse(questionsJSONString)
+        questions: JSON.parse(questionsJSONString),
+        scriptQuizIntroduction: formData.get('scriptQuizIntroduction')
     })
 
     if(!validateFields.success) {
@@ -281,6 +291,7 @@ export async function createLiveQuiz(prevState: LiveQuizFormState, formData: For
         if(errorFormat.amount) errors.amount = errorFormat.amount._errors
         if(errorFormat.startDate) errors.startDate = errorFormat.startDate._errors
         if(errorFormat.endDate) errors.endDate = errorFormat.endDate._errors
+        if(errorFormat.scriptQuizIntroduction) errors.scriptQuizIntroduction = errorFormat.scriptQuizIntroduction._errors
 
         if(errorFormat.questions) {
             errors.questions = {}
@@ -390,6 +401,14 @@ const updateLiveQuizSchema = z.object({
         message: "Question list can't be empty"
     }).max(10, {
         message: "Question list cannot exceed 10 questions"
+    }),
+    scriptQuizIntroduction: z.string({
+        required_error: "Quiz's introduction is required",
+        invalid_type_error: "Quiz's introduction must be a string"
+    }).trim().min(1, {
+        message: "Quiz's introduction can't be a whitespace string" 
+    }).max(500, {
+        message: "Quiz's introduce is too long" 
     })
 }).refine(data => new Date(data.endDate) > new Date(data.startDate), {
     message: "End date must be later than start date",
@@ -420,7 +439,8 @@ export async function updateLiveQuiz(prevState: LiveQuizFormState, formData: For
         amount: formData.get('amount'),
         startDate: formData.get('startDate'),
         endDate: formData.get('endDate'),
-        questions: JSON.parse(questionsJSONString)
+        questions: JSON.parse(questionsJSONString),
+        scriptQuizIntroduction: formData.get('scriptQuizIntroduction')
     })
 
     if(!validateFields.success) {
@@ -438,6 +458,7 @@ export async function updateLiveQuiz(prevState: LiveQuizFormState, formData: For
         if(errorFormat.amount) errors.amount = errorFormat.amount._errors
         if(errorFormat.startDate) errors.startDate = errorFormat.startDate._errors
         if(errorFormat.endDate) errors.endDate = errorFormat.endDate._errors
+        if(errorFormat.scriptQuizIntroduction) errors.scriptQuizIntroduction = errorFormat.scriptQuizIntroduction._errors
 
         if(errorFormat.questions) {
             errors.questions = {}
@@ -960,6 +981,31 @@ export async function generateAnswerComment(question: string, answers: string[],
             "model": "qwen/qwen-2-7b-instruct:free",
             "messages": [
                 { "role": "user", "content": prompt },
+            ],
+        })
+    })
+
+    if(!response.ok){
+        return `${response.status}`
+    }
+
+    const data = await response.json()
+    return data.choices[0].message.content.trim();
+}
+
+export async function generateQuizIntroduction(prompt: string): Promise<string>{
+    const promptToSend = `Help me write an introduction for a live quiz game based on this prompt: "${prompt}". Note that the introduction must be no longer than 4 sentences or 500 characters and do not enclose the introduction in quotation marks.`
+
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+            "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            "model": "qwen/qwen-2-7b-instruct:free",
+            "messages": [
+                { "role": "user", "content": promptToSend },
             ],
         })
     })

@@ -5,14 +5,14 @@ import {
     InformationCircleIcon,
     AdjustmentsHorizontalIcon,
     PlusCircleIcon,
-    TrashIcon
+    TrashIcon,
+    ChatBubbleBottomCenterTextIcon
 } from '@heroicons/react/24/outline';
 import { ChangeEvent, FormEvent, useState } from 'react';
 import clsx from 'clsx';
-// import { createLiveQuiz, LiveQuizFormState } from '@/app/lib/action';
 import { useFormState } from 'react-dom';
 import { LiveQuiz, Question } from '@/app/lib/definition';
-import { generateAnswerComment, generatePostQuestionComment, LiveQuizFormState, updateLiveQuiz } from '@/app/lib/action';
+import { generateAnswerComment, generatePostQuestionComment, generateQuizIntroduction, LiveQuizFormState, updateLiveQuiz } from '@/app/lib/action';
 
 export default function LiveQuizEditForm({
     data
@@ -27,8 +27,14 @@ export default function LiveQuizEditForm({
     const [quizDescription, setQuizDescription] = useState<string>(data.description)
     const [voucher, setVoucher] = useState<string>(data.voucher)
     const [voucherAmount, setVoucherAmount] = useState<number>(Number(data.amount))
-    const [startDate, setStartDate] = useState<string>(data.start_date)
-    const [endDate, setEndDate] = useState<string>(data.end_date)
+    const [startDate, setStartDate] = useState<string>(data.startDate)
+    const [endDate, setEndDate] = useState<string>(data.endDate)
+
+    const [scriptQuizIntroduction, setScriptQuizIntroduction] = useState<string>(data.scriptQuizIntroduction)
+    const [quizIntroductionPrompt, setQuizIntroductionPrompt] = useState<string>('')
+    const [canIntroductionGenerate, setCanIntroductionGenerate] = useState<boolean>(false)
+    const [isIntroductionGenerating, setIsIntroductionGenerating] = useState<boolean>(false)
+
     const [questions, setQuestions] = useState<Question[]>(data.questions)
     const [canGenerate, setCanGenerate] = useState<boolean[]>(Array(data.questions.length).fill(true))
     const [isGenerating, setIsGenerating] = useState<boolean[]>(Array(data.questions.length).fill(false))
@@ -128,6 +134,27 @@ export default function LiveQuizEditForm({
         }
     }
 
+    const handleIntroductionPromptChange = (value: string) => {
+        setQuizIntroductionPrompt(value)
+        setCanIntroductionGenerate(value.trim().length !== 0)
+    }
+
+    const handleGenerateIntroduction = async () => {
+        if(quizIntroductionPrompt.trim().length !== 0) {
+            setIsIntroductionGenerating(true)
+
+            try {
+                const generatedIntroduction = await generateQuizIntroduction(quizIntroductionPrompt)
+                setScriptQuizIntroduction(generatedIntroduction)
+            } catch (error) {
+                console.log("Error occured while fetching introduction.")
+                return
+            } finally {
+                setIsIntroductionGenerating(false)
+            }
+        }
+    }
+
     const handleSubmit = async (event: FormEvent) => {
         event.preventDefault();
         
@@ -139,6 +166,7 @@ export default function LiveQuizEditForm({
         formData.append('amount', voucherAmount.toString())
         formData.append('startDate', startDate)
         formData.append('endDate', endDate)
+        formData.append('scriptQuizIntroduction', scriptQuizIntroduction)
         formData.append('questions', JSON.stringify(questions))
 
         formAction(formData)
@@ -251,7 +279,43 @@ export default function LiveQuizEditForm({
             <div className="flex flex-col gap-y-4 py-8 lg:px-8 lg:py-0">
                 <div className="flex gap-x-2 text-gray-950">
                     <AdjustmentsHorizontalIcon className="w-5"/>
-                    <h2 className="font-semibold">Questions</h2>
+                    <h2 className="font-semibold">Contents</h2>
+                </div>
+                <div className="w-full flex flex-col gap-y-4 rounded-md p-6 shadow-md">
+                    <div className="flex gap-x-4 text-gray-950">
+                        <ChatBubbleBottomCenterTextIcon className="w-5"/>
+                        <p className="text-sm font-semibold">Quiz's introduction</p>
+                    </div>
+                    <p className="text-xs text-gray-500">This will be the very first sentence to be spoken during your live quiz. Type in something to summarize your game in the below box.</p>
+                    <div className="relative mt-2 flex flex-col">
+                        <textarea id="quiz_introduction" maxLength={500} rows={8} value={scriptQuizIntroduction} className="resize-none block w-full p-2 text-sm text-gray-950 bg-transparent rounded-md border-1 border-gray-500 focus:outline-none focus:ring-0 focus:border-violet-800 transition-colors duration-300 peer" placeholder=" " required onChange={(e) => setScriptQuizIntroduction(e.target.value)}/>
+                        <label htmlFor="quiz_introduction" className="absolute bg-white px-2 rounded-full text-sm text-gray-500 transform -translate-y-6 scale-75 top-4 left-0.5 origin-top-left z-10 peer-focus:start-0 peer-focus:text-violet-800 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-2 peer-focus:scale-75 peer-focus:-translate-y-6 peer-focus:left-0.5 after:content-['*'] after:ml-0.5 after:text-red-500 duration-300">Quiz's introduction</label>
+                        {state.errors?.scriptQuizIntroduction && state.errors.scriptQuizIntroduction.map((error: string) => (
+                            <p className="text-xs text-red-700 mt-2" key={error}>{error}</p>
+                        ))}
+                    </div>
+                    <p className="text-xs text-gray-500">Alternatively, you can write a prompt and click on the below button to let our AI generate the introduction for you.</p>
+                    <div className="relative mt-2 flex flex-col">
+                        <textarea id="quiz_introduction_prompt" maxLength={200} rows={4} value={quizIntroductionPrompt} className="resize-none block w-full p-2 text-sm text-gray-950 bg-transparent rounded-md border-1 border-gray-500 focus:outline-none focus:ring-0 focus:border-violet-800 transition-colors duration-300 peer" placeholder=" " required onChange={(e) => handleIntroductionPromptChange(e.target.value)}/>
+                        <label htmlFor="quiz_introduction_prompt" className="absolute bg-white px-2 rounded-full text-sm text-gray-500 transform -translate-y-6 scale-75 top-4 left-0.5 origin-top-left z-10 peer-focus:start-0 peer-focus:text-violet-800 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-2 peer-focus:scale-75 peer-focus:-translate-y-6 peer-focus:left-0.5 duration-300">Prompt</label>
+                    </div>
+                    {canIntroductionGenerate && !isIntroductionGenerating ? (
+                        <button type="button" className="w-full text-violet-50 text-sm font-bold bg-gray-950 py-4 px-2 rounded-md hover:bg-violet-800 transition-colors duration-300" onClick={() => handleGenerateIntroduction()}>
+                            Generate introduction
+                        </button>
+                    ) : isIntroductionGenerating ? (
+                        <div className="cursor-not-allowed w-full flex items-center justify-center gap-x-4 text-violet-50 text-sm font-bold bg-gray-500 py-4 px-2 rounded-md">
+                            <span className="relative flex h-4 w-4">
+                                <span className="animate-ping absolute w-full h-full rounded-full bg-violet-50 opacity-75"/>
+                                <span className="relative inline-flex rounded-full w-4 h-4 bg-violet-50 opacity-75"/>
+                            </span>
+                            <span>Generating...</span>
+                        </div>
+                    ) : (
+                        <div className="cursor-not-allowed w-full flex items-center justify-center text-violet-50 text-sm font-bold bg-gray-500 py-4 px-2 rounded-md">
+                            Generate introduction
+                        </div>
+                    )}
                 </div>
                 {questions.map((question, index) => (
                     <div key={index} className="w-full flex flex-col gap-y-4 rounded-md p-6 shadow-md">
@@ -317,7 +381,7 @@ export default function LiveQuizEditForm({
                                 Generate comments
                             </button>
                         ) : isGenerating[index] ? (
-                            <div className="cursor-not-allowed w-full flex items-center justify-center gap-x-4 text-violet-50 text-sm font-bold bg-gray-500 py-4 px-2 rounded-md" onClick={() => handleGenerateComments(index)}>
+                            <div className="cursor-not-allowed w-full flex items-center justify-center gap-x-4 text-violet-50 text-sm font-bold bg-gray-500 py-4 px-2 rounded-md">
                                 <span className="relative flex h-4 w-4">
                                     <span className="animate-ping absolute w-full h-full rounded-full bg-violet-50 opacity-75"/>
                                     <span className="relative inline-flex rounded-full w-4 h-4 bg-violet-50 opacity-75"/>
@@ -325,7 +389,7 @@ export default function LiveQuizEditForm({
                                 <span>Generating...</span>
                             </div>
                         ) : (
-                            <div className="cursor-not-allowed w-full flex items-center justify-center text-violet-50 text-sm font-bold bg-gray-500 py-4 px-2 rounded-md" onClick={() => handleGenerateComments(index)}>
+                            <div className="cursor-not-allowed w-full flex items-center justify-center text-violet-50 text-sm font-bold bg-gray-500 py-4 px-2 rounded-md">
                                 Generate comments
                             </div>
                         )}

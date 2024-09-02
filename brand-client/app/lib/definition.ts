@@ -15,9 +15,10 @@ export type LiveQuiz = {
     description: string,
     voucher: string,
     amount: string,
-    start_date: string,
-    end_date: string,
-    questions: Question[]
+    startDate: string,
+    endDate: string,
+    questions: Question[],
+    scriptQuizIntroduction: string
 }
 
 export type Game = {

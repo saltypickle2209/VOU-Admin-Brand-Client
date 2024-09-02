@@ -27,8 +27,8 @@ export default function Page({ params }: { params: { id: string }}){
         description: "Something",
         voucher: "2",
         amount: "500",
-        start_date: "2024-08-13",
-        end_date: "2024-10-13",
+        startDate: "2024-08-13",
+        endDate: "2024-10-13",
         questions: [
             {
                 question: "What is the capital of France",
@@ -40,7 +40,8 @@ export default function Page({ params }: { params: { id: string }}){
                 scriptPostQuestion: "This is some post question comment",
                 scriptAnswer: "This is some answer comment"
             }
-        ]
+        ],
+        scriptQuizIntroduction: "This is some quiz's instruction"
     }
 
     return (

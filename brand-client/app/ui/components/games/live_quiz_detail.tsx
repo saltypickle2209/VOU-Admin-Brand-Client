@@ -1,5 +1,6 @@
 import {
     AdjustmentsHorizontalIcon,
+    ChatBubbleBottomCenterTextIcon
 } from '@heroicons/react/24/outline';
 import BasicInformation from './basic_information';
 
@@ -11,9 +12,15 @@ export default function LiveQuizDetail({ gameId }: { gameId: string }){
             <div className="flex flex-col gap-y-4 py-8 lg:px-8 lg:py-0">
                 <div className="flex gap-x-2 text-gray-950">
                     <AdjustmentsHorizontalIcon className="w-5"/>
-                    <h2 className="font-semibold">Questions</h2>
+                    <h2 className="font-semibold">Contents</h2>
                 </div>
-
+                <div className="w-full flex flex-col gap-y-4 rounded-md p-6 shadow-md">
+                    <div className="flex gap-x-4 text-gray-950">
+                        <ChatBubbleBottomCenterTextIcon className="w-5"/>
+                        <p className="text-sm font-semibold">Quiz's introduction</p>
+                    </div>
+                    <p className="text-gray-500 text-sm">Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, soluta?</p>
+                </div>
                 <div className="w-full flex flex-col gap-y-4 rounded-md p-6 shadow-md">
                     <p className="text-sm font-semibold text-gray-950">Question #1</p>
                     <p className="font-semibold text-gray-950">What is the capital of France?</p>
