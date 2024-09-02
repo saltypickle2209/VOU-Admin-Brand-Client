@@ -2,7 +2,10 @@
 
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
+import { cookies } from "next/headers"
 import {z} from 'zod'
+
+const baseURL = "http://localhost:8000"
 
 const MAX_FILE_SIZE = 1024 * 1024 * 5;
 const ACCEPTED_FILE_TYPES = ['image/png', 'image/jpg'];
@@ -766,9 +769,34 @@ export async function logIn(prevState: LoginFormState, formData: FormData): Prom
     }
     else {
         console.log("Passed validation")
-
+        console.log(`${baseURL}/auth/login`)
         // Pack data and send to express server
+        const response = await fetch(`${baseURL}/auth/login`, {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                "email": formData.get('username'),
+                "password": formData.get('password')
+            })
+        })
+    
+        if(!response.ok){
+            const errorMessage = await response.text()
+            return {
+                message: errorMessage
+            }
+        }
+
+        const data = await response.json()
+        //console.log(data.token)
+        
         // Get a token and store it somewhere
+        cookies().set('token', data.token, {
+            httpOnly: true,
+            maxAge: 60 * 60
+        })
 
         revalidatePath("/dashboard")
         redirect("/dashboard")
