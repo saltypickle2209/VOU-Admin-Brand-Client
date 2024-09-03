@@ -280,7 +280,7 @@ export default function LiveQuizForm() {
                     </div>
                     <p className="text-xs text-gray-500">Alternatively, you can write a prompt and click on the below button to let our AI generate the introduction for you.</p>
                     <div className="relative mt-2 flex flex-col">
-                        <textarea id="quiz_introduction_prompt" maxLength={200} rows={4} value={quizIntroductionPrompt} className="resize-none block w-full p-2 text-sm text-gray-950 bg-transparent rounded-md border-1 border-gray-500 focus:outline-none focus:ring-0 focus:border-violet-800 transition-colors duration-300 peer" placeholder=" " required onChange={(e) => handleIntroductionPromptChange(e.target.value)}/>
+                        <textarea id="quiz_introduction_prompt" maxLength={200} rows={4} value={quizIntroductionPrompt} className="resize-none block w-full p-2 text-sm text-gray-950 bg-transparent rounded-md border-1 border-gray-500 focus:outline-none focus:ring-0 focus:border-violet-800 transition-colors duration-300 peer" placeholder=" " onChange={(e) => handleIntroductionPromptChange(e.target.value)}/>
                         <label htmlFor="quiz_introduction_prompt" className="absolute bg-white px-2 rounded-full text-sm text-gray-500 transform -translate-y-6 scale-75 top-4 left-0.5 origin-top-left z-10 peer-focus:start-0 peer-focus:text-violet-800 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-2 peer-focus:scale-75 peer-focus:-translate-y-6 peer-focus:left-0.5 duration-300">Prompt</label>
                     </div>
                     {canIntroductionGenerate && !isIntroductionGenerating ? (

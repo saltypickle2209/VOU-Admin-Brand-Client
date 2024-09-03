@@ -42,3 +42,10 @@ export type Event = {
     end_date: string,
     games: Game[]
 }
+
+export type CollectableItem = {
+    image: string | File | null,
+    name: string,
+    description: string,
+    ratio: string
+}

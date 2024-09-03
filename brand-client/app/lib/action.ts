@@ -1022,3 +1022,265 @@ export async function generateQuizIntroduction(prompt: string): Promise<string>{
     const data = await response.json()
     return data.choices[0].message.content.trim();
 }
+
+const collectableItemSchema = z.object({
+    name: z.string({
+        required_error: "Item's name is required",
+        invalid_type_error: "Item's name must be a string"
+    }).trim().min(1, { 
+        message: "Item's name can't be a whitespace string" 
+    }).max(200, {
+        message: "Item's name is too long" 
+    }),
+    description: z.string({
+        required_error: "Item's description is required",
+        invalid_type_error: "Item's description must be a string"
+    }).trim().min(1, {
+        message: "Item's description can't be a whitespace string" 
+    }).max(500, {
+        message: "Item's description is too long" 
+    }),
+    ratio: z.coerce.number({
+        required_error: "Ratio is required",
+        invalid_type_error: "Ratio must be a number"
+    }).int({
+        message: "Ratio should be an integer" 
+    }).positive({
+        message: "Ratio should be positive" 
+    })
+})
+
+const itemCollectingSchema = z.object({
+    poster: z.instanceof(File, {
+        message: "Poster must be JPEG or PNG file"
+    }).refine(file => {
+        const allowedTypes = ['image/jpeg', 'image/png'];
+        return allowedTypes.includes(file.type);
+    }, { 
+        message: "File type must be JPEG or PNG"
+    }),
+    name: z.string({
+        required_error: "Quiz's name is required",
+        invalid_type_error: "Quiz's name must be a string"
+    }).trim().min(1, { 
+        message: "Quiz's name can't be a whitespace string" 
+    }).max(200, {
+        message: "Quiz's name is too long" 
+    }),
+    description: z.string({
+        required_error: "Quiz's description is required",
+        invalid_type_error: "Quiz's description must be a string"
+    }).trim().min(1, {
+        message: "Quiz's description can't be a whitespace string" 
+    }).max(500, {
+        message: "Quiz's description is too long" 
+    }),
+    voucher: z.string({
+        required_error: "Quiz's voucher is required",
+        invalid_type_error: "Quiz's voucher must be a string"
+    }).trim().min(1, { 
+        message: "Quiz's voucher can't be a whitespace string" 
+    }),
+    amount: z.coerce.number({
+        required_error: "Amount is required",
+        invalid_type_error: "Amount must be a number"
+    }).int({
+        message: "Amount should be an integer" 
+    }).positive({
+        message: "Amount should be positive" 
+    }),
+    startDate: z.string({
+        required_error: "Start date is required",
+        invalid_type_error: "Start date must be a string"
+    }).date("Invalid start date").refine(date => {
+        const today = new Date()
+        const parsedDate = new Date(date)
+        today.setHours(0, 0, 0, 0)
+        parsedDate.setHours(0, 0, 0, 0)
+        return parsedDate >= today
+    }, {
+        message: "Start date must be today or later"
+    }),
+    endDate: z.string({
+        required_error: "End date is required",
+        invalid_type_error: "End date must be a string"
+    }).date("Invalid end date"),
+    items: z.array(collectableItemSchema, {
+        message: "Invalid items data"
+    }).length(6, {
+        message: "Invalid items data"
+    }),
+    item_image_1: z.instanceof(File, {
+        message: "Image must be JPEG or PNG file"
+    }).refine(file => {
+        const allowedTypes = ['image/jpeg', 'image/png'];
+        return allowedTypes.includes(file.type);
+    }, { 
+        message: "File type must be JPEG or PNG"
+    }),
+    item_image_2: z.instanceof(File, {
+        message: "Image must be JPEG or PNG file"
+    }).refine(file => {
+        const allowedTypes = ['image/jpeg', 'image/png'];
+        return allowedTypes.includes(file.type);
+    }, { 
+        message: "File type must be JPEG or PNG"
+    }),
+    item_image_3: z.instanceof(File, {
+        message: "Image must be JPEG or PNG file"
+    }).refine(file => {
+        const allowedTypes = ['image/jpeg', 'image/png'];
+        return allowedTypes.includes(file.type);
+    }, { 
+        message: "File type must be JPEG or PNG"
+    }),
+    item_image_4: z.instanceof(File, {
+        message: "Image must be JPEG or PNG file"
+    }).refine(file => {
+        const allowedTypes = ['image/jpeg', 'image/png'];
+        return allowedTypes.includes(file.type);
+    }, { 
+        message: "File type must be JPEG or PNG"
+    }),
+    item_image_5: z.instanceof(File, {
+        message: "Image must be JPEG or PNG file"
+    }).refine(file => {
+        const allowedTypes = ['image/jpeg', 'image/png'];
+        return allowedTypes.includes(file.type);
+    }, { 
+        message: "File type must be JPEG or PNG"
+    }),
+    item_image_6: z.instanceof(File, {
+        message: "Image must be JPEG or PNG file"
+    }).refine(file => {
+        const allowedTypes = ['image/jpeg', 'image/png'];
+        return allowedTypes.includes(file.type);
+    }, { 
+        message: "File type must be JPEG or PNG"
+    })
+}).refine(data => new Date(data.endDate) > new Date(data.startDate), {
+    message: "End date must be later than start date",
+    path: ["endDate"]
+})
+
+export type ItemCollectingFormState = {
+    errors?: {
+        poster?: string[],
+        name?: string[],
+        description?: string[],
+        voucher?: string[],
+        amount?: string[],
+        startDate?: string[],
+        endDate?: string[],
+        items?: {
+            generalError?: string[],
+            itemErrors?: Array<{
+                name?: string[],
+                description?: string[],
+                ratio?: string[]
+            }>,
+            itemImageErrors?: Array<string[]>
+        }
+    }
+    message?: string | null
+}
+
+export async function createItemCollecting(prevState: ItemCollectingFormState, formData: FormData) : Promise<ItemCollectingFormState>{
+    let itemsJSONString: any = ''
+
+    try {
+        console.log(formData)
+        itemsJSONString = formData.get('items')
+        if(typeof itemsJSONString !== 'string'){
+            throw new Error()
+        }
+    } catch (error) {
+        console.log(error)
+        return {
+            message: "Something went wrong!"
+        }
+    }
+    const validateFields = itemCollectingSchema.safeParse({
+        poster: formData.get('poster'),
+        name: formData.get('name'),
+        description: formData.get('description'),
+        voucher: formData.get('voucher'),
+        amount: formData.get('amount'),
+        startDate: formData.get('startDate'),
+        endDate: formData.get('endDate'),
+        item_image_1: formData.get('item_image_1'),
+        item_image_2: formData.get('item_image_2'),
+        item_image_3: formData.get('item_image_3'),
+        item_image_4: formData.get('item_image_4'),
+        item_image_5: formData.get('item_image_5'),
+        item_image_6: formData.get('item_image_6'),
+        items: JSON.parse(itemsJSONString)
+    })
+
+    if(!validateFields.success) {
+        const errorFormat = validateFields.error.format()
+        console.log("-------------------------------------")
+        console.log(errorFormat)
+        console.log("-------------------------------------")
+
+        const errors: ItemCollectingFormState['errors'] = {}
+
+        if(errorFormat.poster) errors.poster = errorFormat.poster._errors
+        if(errorFormat.name) errors.name = errorFormat.name._errors
+        if(errorFormat.description) errors.description = errorFormat.description._errors
+        if(errorFormat.voucher) errors.voucher = errorFormat.voucher._errors
+        if(errorFormat.amount) errors.amount = errorFormat.amount._errors
+        if(errorFormat.startDate) errors.startDate = errorFormat.startDate._errors
+        if(errorFormat.endDate) errors.endDate = errorFormat.endDate._errors
+
+        if(errorFormat.items) {
+            errors.items = {}
+            const iErrors = errorFormat.items
+            if(iErrors._errors.length > 0) {
+                errors.items.generalError = iErrors._errors
+            }
+            else {
+                const indices = Object.keys(iErrors).filter(key => key !== '_errors').map(Number)
+                const maxIndex = Math.max(...indices)
+
+                const itemErrors = Array(maxIndex + 1).fill(null).map(() => ({}))
+
+                indices.forEach(index => {
+                    const itemError = iErrors[index] as any
+                    const itemErrorObj: any = {}
+                    if(itemError.name) itemErrorObj.name = itemError.name._errors
+                    if(itemError.description) itemErrorObj.description = itemError.description._errors
+                    if(itemError.ratio) itemErrorObj.ratio = itemError.ratio._errors
+
+                    itemErrors[index] = itemErrorObj
+                })
+
+                errors.items.itemErrors = itemErrors
+
+                errors.items.itemImageErrors = Array(maxIndex + 1).fill(null)
+                if(errorFormat.item_image_1) errors.items.itemImageErrors[0] = errorFormat.item_image_1._errors
+                if(errorFormat.item_image_2) errors.items.itemImageErrors[1] = errorFormat.item_image_2._errors
+                if(errorFormat.item_image_3) errors.items.itemImageErrors[2] = errorFormat.item_image_3._errors
+                if(errorFormat.item_image_4) errors.items.itemImageErrors[3] = errorFormat.item_image_4._errors
+                if(errorFormat.item_image_5) errors.items.itemImageErrors[4] = errorFormat.item_image_5._errors
+                if(errorFormat.item_image_6) errors.items.itemImageErrors[5] = errorFormat.item_image_6._errors
+            }
+        }
+
+        console.log(errors)
+        console.log("****************************")
+
+        return {
+            errors: errors,
+            message: "Invalid Form. Try filling it in correctly and submit again."
+        }
+    }
+    else {
+        console.log("Passed validation")
+
+        // Pack data and send to express server
+
+        revalidatePath('/games')
+        redirect('/games')
+    }
+}
