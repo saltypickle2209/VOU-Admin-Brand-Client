@@ -7,7 +7,7 @@ export default function BasicInformation({ gameId }: { gameId: string }) {
     return (
         <div className="relative w-full h-full">
             <div className="sticky top-0 flex flex-col gap-y-4 py-8 lg:px-8 lg:py-0">
-                <div className="flex gap-x-2 text-gray-950">
+                <div className="flex gap-x-2 items-center text-gray-950">
                     <InformationCircleIcon className="w-5"/>
                     <h2 className="font-semibold">Basic Information</h2>
                 </div>

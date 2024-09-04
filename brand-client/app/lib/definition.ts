@@ -43,6 +43,12 @@ export type Event = {
     games: Game[]
 }
 
+export type ItemSet = {
+    name: string,
+    description: string,
+    items: string[]
+}
+
 export type CollectableItem = {
     image: string | File | null,
     name: string,
@@ -59,4 +65,5 @@ export type ItemCollecting = {
     startDate: string,
     endDate: string,
     items: CollectableItem[],
+    itemSets: ItemSet[]
 }

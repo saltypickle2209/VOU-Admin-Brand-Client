@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { cookies } from "next/headers"
-import {z} from 'zod'
+import {string, z} from 'zod'
 
 const baseURL = "http://localhost:8000"
 
@@ -1061,7 +1061,7 @@ const collectableItemSchema = z.object({
         invalid_type_error: "Item's description must be a string"
     }).trim().min(1, {
         message: "Item's description can't be a whitespace string" 
-    }).max(500, {
+    }).max(200, {
         message: "Item's description is too long" 
     }),
     ratio: z.coerce.number({
@@ -1071,6 +1071,30 @@ const collectableItemSchema = z.object({
         message: "Ratio should be an integer" 
     }).positive({
         message: "Ratio should be positive" 
+    })
+})
+
+const itemSetSchema = z.object({
+    name: z.string({
+        required_error: "Item set's name is required",
+        invalid_type_error: "Item set's name must be a string"
+    }).trim().min(1, { 
+        message: "Item set's name can't be a whitespace string" 
+    }).max(200, {
+        message: "Item set's name is too long" 
+    }),
+    description: z.string({
+        required_error: "Item set's description is required",
+        invalid_type_error: "Item set's description must be a string"
+    }).trim().min(1, {
+        message: "Item set's description can't be a whitespace string" 
+    }).max(200, {
+        message: "Item set's description is too long" 
+    }),
+    items: z.array(z.string(), {
+        message: "Invalid items data"
+    }).nonempty({
+        message: "Item set must have at least 1 item"
     })
 })
 
@@ -1181,6 +1205,11 @@ const itemCollectingSchema = z.object({
         return allowedTypes.includes(file.type);
     }, { 
         message: "File type must be JPEG or PNG"
+    }),
+    itemSets: z.array(itemSetSchema).nonempty({
+        message: "Item set list can't be empty"
+    }).max(10, {
+        message: "Item set list cannot exceed 10 items"
     })
 }).refine(data => new Date(data.endDate) > new Date(data.startDate), {
     message: "End date must be later than start date",
@@ -1205,16 +1234,29 @@ export type ItemCollectingFormState = {
             }>,
             itemImageErrors?: Array<string[]>
         }
+        itemSets?: {
+            generalError?: string[],
+            itemSetErrors?: Array<{
+                name?: string[],
+                description?: string[],
+                items?: string[]
+            }>
+        }
     }
     message?: string | null
 }
 
 export async function createItemCollecting(prevState: ItemCollectingFormState, formData: FormData) : Promise<ItemCollectingFormState>{
     let itemsJSONString: any = ''
+    let itemSetsJSONString: any = ''
 
     try {
         console.log(formData)
         itemsJSONString = formData.get('items')
+        if(typeof itemsJSONString !== 'string'){
+            throw new Error()
+        }
+        itemSetsJSONString = formData.get('itemSets')
         if(typeof itemsJSONString !== 'string'){
             throw new Error()
         }
@@ -1238,7 +1280,8 @@ export async function createItemCollecting(prevState: ItemCollectingFormState, f
         item_image_4: formData.get('item_image_4'),
         item_image_5: formData.get('item_image_5'),
         item_image_6: formData.get('item_image_6'),
-        items: JSON.parse(itemsJSONString)
+        items: JSON.parse(itemsJSONString),
+        itemSets: JSON.parse(itemSetsJSONString)
     })
 
     if(!validateFields.success) {
@@ -1288,6 +1331,32 @@ export async function createItemCollecting(prevState: ItemCollectingFormState, f
                 if(errorFormat.item_image_4) errors.items.itemImageErrors[3] = errorFormat.item_image_4._errors
                 if(errorFormat.item_image_5) errors.items.itemImageErrors[4] = errorFormat.item_image_5._errors
                 if(errorFormat.item_image_6) errors.items.itemImageErrors[5] = errorFormat.item_image_6._errors
+            }
+        }
+
+        if(errorFormat.itemSets) {
+            errors.itemSets = {}
+            const iSErrors = errorFormat.itemSets
+            if(iSErrors._errors.length > 0) {
+                errors.itemSets.generalError = iSErrors._errors
+            }
+            else {
+                const indices = Object.keys(iSErrors).filter(key => key !== '_errors').map(Number)
+                const maxIndex = Math.max(...indices)
+
+                const itemSErrors = Array(maxIndex + 1).fill(null).map(() => ({}))
+
+                indices.forEach(index => {
+                    const itemSetError = iSErrors[index] as any
+                    const itemSetErrorObj: any = {}
+                    if(itemSetError.name) itemSetErrorObj.name = itemSetError.name._errors
+                    if(itemSetError.description) itemSetErrorObj.description = itemSetError.description._errors
+                    if(itemSetError.items) itemSetErrorObj.items = itemSetError.items._errors
+
+                    itemSErrors[index] = itemSetErrorObj
+                })
+
+                errors.itemSets.itemSetErrors = itemSErrors
             }
         }
 
@@ -1466,7 +1535,12 @@ const updateItemCollectingSchema = z.object({
         }).url({
             message: "Image URL is invalid"
         })
-    ])
+    ]),
+    itemSets: z.array(itemSetSchema).nonempty({
+        message: "Item set list can't be empty"
+    }).max(10, {
+        message: "Item set list cannot exceed 10 items"
+    })
 }).refine(data => new Date(data.endDate) > new Date(data.startDate), {
     message: "End date must be later than start date",
     path: ["endDate"]
@@ -1474,10 +1548,15 @@ const updateItemCollectingSchema = z.object({
 
 export async function updateItemCollecting(prevState: ItemCollectingFormState, formData: FormData) : Promise<ItemCollectingFormState>{
     let itemsJSONString: any = ''
+    let itemSetsJSONString: any = ''
 
     try {
         console.log(formData)
         itemsJSONString = formData.get('items')
+        if(typeof itemsJSONString !== 'string'){
+            throw new Error()
+        }
+        itemSetsJSONString = formData.get('itemSets')
         if(typeof itemsJSONString !== 'string'){
             throw new Error()
         }
@@ -1501,7 +1580,8 @@ export async function updateItemCollecting(prevState: ItemCollectingFormState, f
         item_image_4: formData.get('item_image_4'),
         item_image_5: formData.get('item_image_5'),
         item_image_6: formData.get('item_image_6'),
-        items: JSON.parse(itemsJSONString)
+        items: JSON.parse(itemsJSONString),
+        itemSets: JSON.parse(itemSetsJSONString)
     })
 
     if(!validateFields.success) {
@@ -1551,6 +1631,32 @@ export async function updateItemCollecting(prevState: ItemCollectingFormState, f
                 if(errorFormat.item_image_4) errors.items.itemImageErrors[3] = errorFormat.item_image_4._errors
                 if(errorFormat.item_image_5) errors.items.itemImageErrors[4] = errorFormat.item_image_5._errors
                 if(errorFormat.item_image_6) errors.items.itemImageErrors[5] = errorFormat.item_image_6._errors
+            }
+        }
+
+        if(errorFormat.itemSets) {
+            errors.itemSets = {}
+            const iSErrors = errorFormat.itemSets
+            if(iSErrors._errors.length > 0) {
+                errors.itemSets.generalError = iSErrors._errors
+            }
+            else {
+                const indices = Object.keys(iSErrors).filter(key => key !== '_errors').map(Number)
+                const maxIndex = Math.max(...indices)
+
+                const itemSErrors = Array(maxIndex + 1).fill(null).map(() => ({}))
+
+                indices.forEach(index => {
+                    const itemSetError = iSErrors[index] as any
+                    const itemSetErrorObj: any = {}
+                    if(itemSetError.name) itemSetErrorObj.name = itemSetError.name._errors
+                    if(itemSetError.description) itemSetErrorObj.description = itemSetError.description._errors
+                    if(itemSetError.items) itemSetErrorObj.items = itemSetError.items._errors
+
+                    itemSErrors[index] = itemSetErrorObj
+                })
+
+                errors.itemSets.itemSetErrors = itemSErrors
             }
         }
 

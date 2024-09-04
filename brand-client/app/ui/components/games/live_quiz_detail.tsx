@@ -10,7 +10,7 @@ export default function LiveQuizDetail({ gameId }: { gameId: string }){
         <div className="w-full px-6 grid grid-cols-1 divide-y-2 divide-gray-300 lg:py-6 lg:px-0 lg:divide-y-0 lg:divide-x-2 lg:grid-cols-2 bg-white rounded-md shadow-md">
             <BasicInformation gameId={gameId}/>
             <div className="flex flex-col gap-y-4 py-8 lg:px-8 lg:py-0">
-                <div className="flex gap-x-2 text-gray-950">
+                <div className="flex gap-x-2 items-center text-gray-950">
                     <AdjustmentsHorizontalIcon className="w-5"/>
                     <h2 className="font-semibold">Contents</h2>
                 </div>

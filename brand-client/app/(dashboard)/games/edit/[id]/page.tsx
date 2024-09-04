@@ -90,6 +90,13 @@ export default function Page({ params }: { params: { id: string }}){
                 description: "Description 6",
                 ratio: "1000"
             }
+        ],
+        itemSets: [
+            {
+                name: "Item set 1",
+                description: "Description meo meo meo",
+                items: ['0', '1', '5']
+            }
         ]
     }
 

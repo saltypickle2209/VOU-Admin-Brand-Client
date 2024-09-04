@@ -173,7 +173,7 @@ export default function LiveQuizForm() {
         <form onSubmit={handleSubmit} className="w-full px-6 grid grid-cols-1 divide-y-2 divide-gray-300 lg:py-6 lg:px-0 lg:divide-y-0 lg:divide-x-2 lg:grid-cols-2 bg-white rounded-md shadow-md">
             <div className="relative w-full h-full">
                 <div className="sticky top-0 flex flex-col gap-y-4 py-8 lg:px-8 lg:py-0">
-                    <div className="flex gap-x-2 text-gray-950">
+                    <div className="flex gap-x-2 items-center text-gray-950">
                         <InformationCircleIcon className="w-5"/>
                         <h2 className="font-semibold">Basic Information</h2>
                     </div>
@@ -250,18 +250,18 @@ export default function LiveQuizForm() {
                         </div>
                     </div>
                     <button type="submit" className="w-full text-violet-50 text-sm font-bold bg-gray-950 py-4 px-2 rounded-md hover:bg-violet-800 transition-colors duration-300">Submit</button>
-                    <div className="flex flex-col">
-                        {state.message && (
+                    {state.message && (
+                        <div className="flex flex-col">
                             <p className="text-xs text-red-700">{state.message}</p>
-                        )}
-                        {state.errors?.questions?.generalError && state.errors.questions.generalError.map((error: string) => (
-                            <p className="text-xs text-red-700 mt-2" key={error}>{error}</p>
-                        ))}
-                    </div>
+                            {state.errors?.questions?.generalError && state.errors.questions.generalError.map((error: string) => (
+                                <p className="text-xs text-red-700 mt-2" key={error}>{error}</p>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
             <div className="flex flex-col gap-y-4 py-8 lg:px-8 lg:py-0">
-                <div className="flex gap-x-2 text-gray-950">
+                <div className="flex gap-x-2 items-center text-gray-950">
                     <AdjustmentsHorizontalIcon className="w-5"/>
                     <h2 className="font-semibold">Contents</h2>
                 </div>
@@ -394,10 +394,12 @@ export default function LiveQuizForm() {
                     </div>
                 ))}
                 
-                <button type="button" className="relative flex w-full h-40 rounded-md flex-col gap-y-4 items-center justify-center border-2 border-dashed text-violet-500 border-violet-500 hover:border-violet-800 hover:text-violet-800 transition-colors duration-300" onClick={handleAddQuestion}>
-                    <PlusCircleIcon className="w-16"/>
-                    <p className="text-sm font-semibold">Add a new question</p>
-                </button>
+                {questions.length <= 10 && (
+                    <button type="button" className="relative flex w-full h-40 rounded-md flex-col gap-y-4 items-center justify-center border-2 border-dashed text-violet-500 border-violet-500 hover:border-violet-800 hover:text-violet-800 transition-colors duration-300" onClick={handleAddQuestion}>
+                        <PlusCircleIcon className="w-16"/>
+                        <p className="text-sm font-semibold">Add a new question</p>
+                    </button>
+                )}
             </div>
         </form>
     )
