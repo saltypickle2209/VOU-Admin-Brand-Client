@@ -320,7 +320,7 @@ export default function ItemCollectingEditForm({
                     <div className="w-full flex flex-col gap-y-4 rounded-md p-6 shadow-md">
                         <div className="flex gap-x-4 text-gray-950">
                             <BookmarkIcon className="w-5"/>
-                            <p className="text-sm font-semibold">Quiz's introduction</p>
+                            <p className="text-sm font-semibold">Instruction</p>
                         </div>
                         <p className="text-xs text-gray-500">Item set is a set of items that is used as a requirement for redeeming a prize. When a user collects every item stated in an item set, they can trade them for the prize you rewarded. Thus, it should be great if you can create multiple item sets which can cover all of the items you have created.</p>
                     </div>

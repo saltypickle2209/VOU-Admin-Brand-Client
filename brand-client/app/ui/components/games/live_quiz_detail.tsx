@@ -19,7 +19,7 @@ export default function LiveQuizDetail({ gameId }: { gameId: string }){
                         <ChatBubbleBottomCenterTextIcon className="w-5"/>
                         <p className="text-sm font-semibold">Quiz's introduction</p>
                     </div>
-                    <p className="text-gray-500 text-sm">Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, soluta?</p>
+                    <p className="text-gray-500 text-xs">Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, soluta?</p>
                 </div>
                 <div className="w-full flex flex-col gap-y-4 rounded-md p-6 shadow-md">
                     <p className="text-sm font-semibold text-gray-950">Question #1</p>
@@ -32,11 +32,11 @@ export default function LiveQuizDetail({ gameId }: { gameId: string }){
                     </div>
                     <div className="flex flex-col gap-y-2">
                         <p className="text-sm font-semibold text-gray-950">Post-question comment</p>
-                        <p className="text-gray-500 text-sm">Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, soluta?</p>
+                        <p className="text-gray-500 text-xs">Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, soluta?</p>
                     </div>
                     <div className="flex flex-col gap-y-2">
                         <p className="text-sm font-semibold text-gray-950">Answer comment</p>
-                        <p className="text-gray-500 text-sm">Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, soluta?</p>
+                        <p className="text-gray-500 text-xs">Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, soluta?</p>
                     </div>
                 </div>
                 <div className="w-full flex flex-col gap-y-4 rounded-md p-6 shadow-md">
@@ -50,11 +50,11 @@ export default function LiveQuizDetail({ gameId }: { gameId: string }){
                     </div>
                     <div className="flex flex-col gap-y-2">
                         <p className="text-sm font-semibold text-gray-950">Post-question comment</p>
-                        <p className="text-gray-500 text-sm">Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, soluta?</p>
+                        <p className="text-gray-500 text-xs">Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, soluta?</p>
                     </div>
                     <div className="flex flex-col gap-y-2">
                         <p className="text-sm font-semibold text-gray-950">Answer comment</p>
-                        <p className="text-gray-500 text-sm">Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, soluta?</p>
+                        <p className="text-gray-500 text-xs">Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, soluta?</p>
                     </div>
                 </div>
                 <div className="w-full flex flex-col gap-y-4 rounded-md p-6 shadow-md">
@@ -68,11 +68,11 @@ export default function LiveQuizDetail({ gameId }: { gameId: string }){
                     </div>
                     <div className="flex flex-col gap-y-2">
                         <p className="text-sm font-semibold text-gray-950">Post-question comment</p>
-                        <p className="text-gray-500 text-sm">Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, soluta?</p>
+                        <p className="text-gray-500 text-xs">Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, soluta?</p>
                     </div>
                     <div className="flex flex-col gap-y-2">
                         <p className="text-sm font-semibold text-gray-950">Answer comment</p>
-                        <p className="text-gray-500 text-sm">Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, soluta?</p>
+                        <p className="text-gray-500 text-xs">Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, soluta?</p>
                     </div>
                 </div>
             </div>

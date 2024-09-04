@@ -40,7 +40,7 @@ export default function BasicInformation({ gameId }: { gameId: string }) {
                         </div>
                         <div className="grow h-full p-4 flex flex-col gap-y-2">
                             <p className="text-gray-950 font-semibold line-clamp-1">Voucher's name</p>
-                            <p className="text-gray-500 text-sm line-clamp-2">Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus ut accusantium praesentium suscipit adipisci porro. Cumque hic sunt qui eligendi.</p>
+                            <p className="text-gray-500 text-xs line-clamp-2">Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus ut accusantium praesentium suscipit adipisci porro. Cumque hic sunt qui eligendi.</p>
                             <div className="w-full h-2 mt-auto bg-gray-300 rounded-full relative overflow-hidden after:absolute after:content-[''] after:left-0 after:w-[60%] after:bg-violet-500 after:inset-y-0 after:rounded-md"/>
                         </div>
                     </div>
