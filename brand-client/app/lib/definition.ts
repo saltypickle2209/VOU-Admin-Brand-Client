@@ -49,3 +49,14 @@ export type CollectableItem = {
     description: string,
     ratio: string
 }
+
+export type ItemCollecting = {
+    poster: string,
+    name: string,
+    description: string,
+    voucher: string,
+    amount: string,
+    startDate: string,
+    endDate: string,
+    items: CollectableItem[],
+}
