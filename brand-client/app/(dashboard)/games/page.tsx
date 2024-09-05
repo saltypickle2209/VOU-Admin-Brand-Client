@@ -8,12 +8,13 @@ import Link from "next/link";
 import SearchBar from "@/app/ui/components/search_bar";
 import GamesGrid from "@/app/ui/components/games/game_grid";
 import Pagination from "@/app/ui/components/pagination";
+import { baseURL, Game } from "@/app/lib/definition";
 
 export const metadata: Metadata = {
     title: 'Games',
 };
 
-export default function Page({
+export default async function Page({
     searchParams 
 }: {
     searchParams?: { 
@@ -22,6 +23,20 @@ export default function Page({
 }}) {
     const query = searchParams?.query || '';
     const currentPage = Number(searchParams?.page) || 1;
+    let data: any = null
+
+    try{
+        const response = await fetch(`${baseURL}/game/search?page=${currentPage}&search=${query}`, { cache: 'no-store' })
+        if(!response.ok){
+            throw new Error()
+        }
+        data = await response.json()
+    }
+    catch (error){
+        throw new Error('Something went wrong')
+    }
+
+    const totalPages = data.games.totalPages
 
     return (
         <main className="flex flex-col gap-y-4">
@@ -42,8 +57,8 @@ export default function Page({
                 </Link>
                 <SearchBar placeholder="Search for games"/>
             </div>
-            <GamesGrid query={query} currentPage={currentPage}/>
-            <Pagination totalPages={3}/>
+            <GamesGrid data={data.games.data}/>
+            <Pagination totalPages={totalPages}/>
         </main>
     )
 }
