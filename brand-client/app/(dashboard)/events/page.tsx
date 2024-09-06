@@ -8,12 +8,14 @@ import Link from "next/link";
 import SearchBar from "@/app/ui/components/search_bar";
 import Pagination from "@/app/ui/components/pagination";
 import EventsGrid from "@/app/ui/components/events/events_grid";
+import { baseURL } from "@/app/lib/definition";
+import EmptyGrid from "@/app/ui/components/empty_grid";
 
 export const metadata: Metadata = {
     title: 'Events',
 };
 
-export default function Page({
+export default async function Page({
     searchParams 
 }: {
     searchParams?: { 
@@ -22,6 +24,20 @@ export default function Page({
 }}) {
     const query = searchParams?.query || '';
     const currentPage = Number(searchParams?.page) || 1;
+    let data: any = null
+
+    try{
+        const response = await fetch(`${baseURL}/event/search?page=${currentPage}&search=${query}`, { cache: 'no-store' })
+        if(!response.ok){
+            throw new Error()
+        }
+        data = await response.json()
+    }
+    catch (error){
+        throw new Error('Something went wrong')
+    }
+
+    const totalPages = data.totalPages
 
     return (
         <main className="flex flex-col gap-y-4">
@@ -42,8 +58,14 @@ export default function Page({
                 </Link>
                 <SearchBar placeholder="Search for events"/>
             </div>
-            <EventsGrid query={query} currentPage={currentPage}/>
-            <Pagination totalPages={3}/>
+            {data.data.length === 0 ? (
+                <EmptyGrid url="/events/create"/>
+            ): (
+                <>
+                    <EventsGrid data={data.data}/>
+                    <Pagination totalPages={totalPages}/>
+                </> 
+            )}
         </main>
     )
 }

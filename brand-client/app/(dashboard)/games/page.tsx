@@ -9,6 +9,7 @@ import SearchBar from "@/app/ui/components/search_bar";
 import GamesGrid from "@/app/ui/components/games/game_grid";
 import Pagination from "@/app/ui/components/pagination";
 import { baseURL, Game } from "@/app/lib/definition";
+import EmptyGrid from "@/app/ui/components/empty_grid";
 
 export const metadata: Metadata = {
     title: 'Games',
@@ -57,8 +58,14 @@ export default async function Page({
                 </Link>
                 <SearchBar placeholder="Search for games"/>
             </div>
-            <GamesGrid data={data.games.data}/>
-            <Pagination totalPages={totalPages}/>
+            {data.games.data.length === 0 ? (
+                <EmptyGrid url="/games/create"/>
+            ): (
+                <>
+                    <GamesGrid data={data.games.data}/>
+                    <Pagination totalPages={totalPages}/>
+                </>
+            )}
         </main>
     )
 }
