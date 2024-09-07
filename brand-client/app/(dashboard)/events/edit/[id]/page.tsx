@@ -81,7 +81,7 @@ export default async function Page({ params }: { params: { id: string }}){
         <main className="flex flex-col gap-y-4">
             <h1 className="text-3xl font-bold text-gray-950">✏️ Edit your event</h1>
             <p className="text-sm text-gray-500 hidden md:block">Make changes and submit the form below to update this event item</p>
-            <EventEditForm data={dummyEvent}/>
+            <EventEditForm data={dummyEvent} id={id}/>
         </main>
     )
 }

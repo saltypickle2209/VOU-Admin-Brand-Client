@@ -17,9 +17,11 @@ import { formatDate } from '@/app/lib/utility';
 import { EventFormState, updateEvent } from '@/app/lib/action';
 
 export default function EventEditForm({
-    data
+    data,
+    id
 }: {
-    data: Event
+    data: Event,
+    id: string
 }) {
     const initialState: EventFormState = { message: null, errors: {} }
     const [state, formAction] = useFormState(updateEvent, initialState)
@@ -79,6 +81,7 @@ export default function EventEditForm({
 
         const formData = new FormData()
         if(poster) formData.append('poster', poster)
+        formData.append('id', id)
         formData.append('name', eventName)
         formData.append('description', eventDescription)
         formData.append('startDate', startDate)

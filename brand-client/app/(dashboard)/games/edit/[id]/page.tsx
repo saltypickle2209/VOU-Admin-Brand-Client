@@ -143,8 +143,8 @@ export default async function Page({ params }: { params: { id: string }}){
                 <main className="flex flex-col gap-y-4">
                     <h1 className="text-3xl font-bold text-gray-950">✏️ Edit your game</h1>
                     <p className="text-sm text-gray-500 hidden md:block">Make changes and submit the form below to update this game item</p>
-                    {gameTypeId === 1 && <LiveQuizEditForm data={dummyLiveQuiz}/>}
-                    {gameTypeId === 2 && <ItemCollectingEditForm data={dummyItemCollecting}/>}
+                    {gameTypeId === 1 && <LiveQuizEditForm data={dummyLiveQuiz} id={id}/>}
+                    {gameTypeId === 2 && <ItemCollectingEditForm data={dummyItemCollecting} id={id}/>}
                 </main>
             )}
         </>
