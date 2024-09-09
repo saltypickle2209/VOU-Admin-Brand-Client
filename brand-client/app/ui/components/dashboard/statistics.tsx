@@ -5,7 +5,15 @@ import {
     TicketIcon
 } from '@heroicons/react/24/solid';
 
-export default function Statistics() {
+export default async function Statistics() {
+    function delay(ms: number): Promise<void> {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    await delay(5000);
+
+    // fetch data
+    
     return (
         <div className="grid grid-cols-1 gap-4 xl:grid-cols-4 md:grid-cols-2">
             <div className="flex flex-col-reverse gap-4 sm:flex-row sm:gap-y-0 justify-between items-center w-3/4 h-auto place-self-center md:w-full md:h-32 p-6 bg-white rounded-md shadow-md">

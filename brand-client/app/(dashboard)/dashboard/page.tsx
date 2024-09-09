@@ -7,6 +7,10 @@ import Statistics from "@/app/ui/components/dashboard/statistics";
 import PlayerChart from "@/app/ui/components/dashboard/player_chart";
 import TopEvents from "@/app/ui/components/dashboard/top_events";
 import VoucherChart from "@/app/ui/components/dashboard/voucher_chart";
+import { Suspense } from "react";
+import StatisticsSkeleton from "@/app/ui/components/dashboard/statistics_skeleton";
+import ChartSkeleton from "@/app/ui/components/dashboard/chart_skeleton";
+import TopEventsSkeleton from "@/app/ui/components/dashboard/top_events_skeleton";
 
 export const metadata: Metadata = {
     title: 'Dashboard',
@@ -25,12 +29,20 @@ export default function Page() {
                     </button>
                 </form>
             </div>
-            <Statistics/>
+            <Suspense fallback={<StatisticsSkeleton/>}>
+                <Statistics/>
+            </Suspense>
             <div className="flex flex-col gap-4 xl:flex-row">
-                <PlayerChart/>
-                <VoucherChart/>
+                <Suspense fallback={<ChartSkeleton widthClass="w-3/5" chartHeight="h-[250px]"/>}>
+                    <PlayerChart/>
+                </Suspense>
+                <Suspense fallback={<ChartSkeleton widthClass="w-2/5" chartHeight="h-[250px]"/>}>
+                    <VoucherChart/> 
+                </Suspense>
             </div>
-            <TopEvents/>
+            <Suspense fallback={<TopEventsSkeleton/>}>
+                <TopEvents/>
+            </Suspense>
         </main>
     )
 }

@@ -966,10 +966,10 @@ export async function updateEvent(prevState: EventFormState, formData: FormData)
 
 const loginSchema = z.object({
     email: z.string({
-        required_error: "Username is required",
-        invalid_type_error: "Username must be a string"
+        required_error: "Email is required",
+        invalid_type_error: "Email must be a string"
     }).trim().min(1, { 
-        message: "Username can't be a whitespace string" 
+        message: "Email can't be a whitespace string" 
     }).email("Invalid email format"),
     password: z.string({
         required_error: "Password is required",

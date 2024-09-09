@@ -24,7 +24,15 @@ const data = [
     }
 ]
 
-export default function TopEvents() {
+export default async function TopEvents() {
+    function delay(ms: number): Promise<void> {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    await delay(5000);
+
+    // fetch data
+
     return (
         <div className="flex flex-col w-full gap-y-4 p-6 bg-white rounded-md shadow-md">
             <div className="flex justify-between items-center">
