@@ -19,9 +19,13 @@ import { ItemCollectingFormState, updateItemCollecting } from '@/app/lib/action'
 
 // remember to add voucher list props
 export default function ItemCollectingEditForm({
-    data
+    data,
+    id,
+    gameDataId
 }: {
-    data: ItemCollecting
+    data: ItemCollecting,
+    id: string,
+    gameDataId: string
 }) {
     const initialState: ItemCollectingFormState = { message: null, errors: {} }
     const [state, formAction] = useFormState(updateItemCollecting, initialState)
@@ -102,6 +106,8 @@ export default function ItemCollectingEditForm({
 
         const formData = new FormData()
         if(poster) formData.append('poster', poster)
+        formData.append('id', id)
+        formData.append('gameDataId', gameDataId)
         formData.append('name', quizName)
         formData.append('description', quizDescription)
         formData.append('voucher', voucher)

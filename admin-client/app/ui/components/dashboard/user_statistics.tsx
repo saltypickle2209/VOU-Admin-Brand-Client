@@ -4,7 +4,13 @@ import {
 } from '@heroicons/react/24/solid';
 import Link from 'next/link';
 
-export default function UserStatistics() {
+export default async function UserStatistics() {
+    function delay(ms: number): Promise<void> {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    await delay(5000);
+
     return (
         <div className="flex flex-col gap-4 sm:flex-row sm:gap-y-0 justify-between items-center w-full h-auto place-self-center md:h-32 p-6 bg-white rounded-md shadow-md">
             <div className="flex flex-col gap-y-4 items-center sm:flex-row sm:gap-x-4 grow">

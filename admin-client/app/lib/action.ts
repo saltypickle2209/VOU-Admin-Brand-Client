@@ -3,6 +3,8 @@
 import { revalidatePath, revalidateTag } from "next/cache"
 import { redirect } from "next/navigation"
 import { z } from "zod"
+import { baseURL } from "./definition"
+import { cookies } from "next/headers"
 
 export async function revalidateDashboard() {
     revalidatePath('/dashboard')
@@ -15,12 +17,12 @@ export async function revalidateUsers() {
 }
 
 const loginSchema = z.object({
-    username: z.string({
-        required_error: "Username is required",
-        invalid_type_error: "Username must be a string"
+    email: z.string({
+        required_error: "Email is required",
+        invalid_type_error: "Email must be a string"
     }).trim().min(1, { 
-        message: "Username can't be a whitespace string" 
-    }),
+        message: "Email can't be a whitespace string" 
+    }).email("Invalid email format"),
     password: z.string({
         required_error: "Password is required",
         invalid_type_error: "Password must be a string"
@@ -31,7 +33,7 @@ const loginSchema = z.object({
 
 export type LoginFormState = {
     errors?: {
-        username?: string[],
+        email?: string[],
         password?: string[]
     },
     message?: string | null
@@ -39,7 +41,7 @@ export type LoginFormState = {
 
 export async function logIn(prevState: LoginFormState, formData: FormData): Promise<LoginFormState>{
     const validateFields = loginSchema.safeParse({
-        username: formData.get('username'),
+        email: formData.get('email'),
         password: formData.get('password')
     })
 
@@ -57,8 +59,37 @@ export async function logIn(prevState: LoginFormState, formData: FormData): Prom
     else {
         console.log("Passed validation")
 
-        // Pack data and send to express server
-        // Get a token and store it somewhere
+        try{
+            const response = await fetch(`${baseURL}/auth/login`, {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    "email": formData.get('email'),
+                    "password": formData.get('password')
+                })
+            })
+        
+            if(!response.ok){
+                const errorMessage = await response.text()
+                return {
+                    message: errorMessage
+                }
+            }
+    
+            const data = await response.json()
+            //console.log(data.token)
+            
+            cookies().set('token', data.token, {
+                httpOnly: true,
+                maxAge: 60 * 60
+            })
+        } catch (error) {
+            return {
+                message: "Something went wrong. Try again later."
+            }
+        }
 
         revalidatePath("/dashboard")
         redirect("/dashboard")

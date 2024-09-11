@@ -10,12 +10,12 @@ import BasicInformation from './basic_information';
 import { useState } from 'react';
 
 // remember to add prop to this one
-export default function ItemCollectingDetail({ gameId }: { gameId: string }){
+export default function ItemCollectingDetail({ data }: { data: any }){
     const [isConfiguringItems, setIsConfiguringItems] = useState<boolean>(true)
 
     return (
         <div className="w-full px-6 grid grid-cols-1 divide-y-2 divide-gray-300 lg:py-6 lg:px-0 lg:divide-y-0 lg:divide-x-2 lg:grid-cols-2 bg-white rounded-md shadow-md">
-            <BasicInformation gameId={gameId}/>
+            <BasicInformation data={data}/>
             {isConfiguringItems ? (
                 <div className="flex flex-col gap-y-4 py-8 lg:px-8 lg:py-0">
                     <div className="flex justify-between items-center">

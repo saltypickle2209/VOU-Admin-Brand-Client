@@ -1,6 +1,12 @@
 import AreaChart from "../area_chart"
 
-export default function EventChart() {
+export default async function EventChart() {
+  function delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  await delay(5000);
+
     // fake data fetch
     const data: number[] = []
     for (let i = 0; i < 31; i++){

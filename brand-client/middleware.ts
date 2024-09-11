@@ -2,7 +2,7 @@ import { NextResponse, NextRequest } from 'next/server'
 import { cookies } from "next/headers"
 
 export function middleware(request: NextRequest) {
-    console.log("middleware")
+    // console.log("middleware")
     const pathName = request.nextUrl.pathname
     const cookieStore = cookies()
     const token = cookieStore.get('token')

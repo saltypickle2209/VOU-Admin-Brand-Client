@@ -1,3 +1,5 @@
+export const baseURL = "http://localhost:8000"
+
 export type User = {
     id: string,
     avatar: string,

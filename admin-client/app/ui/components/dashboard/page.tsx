@@ -10,10 +10,6 @@ import UserChart from "@/app/ui/components/dashboard/user_chart";
 import GameStatistics from "@/app/ui/components/dashboard/game_statistics";
 import GameChart from "@/app/ui/components/dashboard/game_chart";
 import VoucherChart from "@/app/ui/components/dashboard/voucher_chart";
-import { Suspense } from "react";
-import StatisticsSkeleton from "@/app/ui/components/dashboard/statistics_skeleton";
-import SingleStatisticsSkeleton from "@/app/ui/components/dashboard/single_statistics_skeleton";
-import ChartSkeleton from "@/app/ui/components/dashboard/chart_skeleton";
 
 export const metadata: Metadata = {
     title: 'Dashboard',
@@ -32,32 +28,18 @@ export default function Page() {
                     </button>
                 </form>
             </div>
-            <Suspense fallback={<StatisticsSkeleton/>}>
-                <BrandStatistics/>
-            </Suspense>
-            <Suspense fallback={<ChartSkeleton widthClass="w-full" chartHeight="h-[250px]"/>}>
-                <EventChart/>
-            </Suspense>
+            <BrandStatistics/>
+            <EventChart/>
             <div className="flex flex-col gap-y-4 mt-4">
-                <Suspense fallback={<SingleStatisticsSkeleton/>}>
-                    <UserStatistics/>
-                </Suspense>
-                <Suspense fallback={<ChartSkeleton widthClass="w-full" chartHeight="h-[250px]"/>}>
-                    <UserChart/>
-                </Suspense>
+                <UserStatistics/>
+                <UserChart/>
             </div>
 
             <div className="flex flex-col gap-y-4 mt-4">
-                <Suspense fallback={<StatisticsSkeleton/>}>
-                    <GameStatistics/>
-                </Suspense>
+                <GameStatistics/>
                 <div className="flex flex-col gap-4 xl:flex-row">
-                    <Suspense fallback={<ChartSkeleton widthClass="w-full" chartHeight="h-[150px]"/>}>
-                        <GameChart/>
-                    </Suspense>
-                    <Suspense fallback={<ChartSkeleton widthClass="w-full" chartHeight="h-[150px]"/>}>
-                        <VoucherChart/>
-                    </Suspense>
+                    <GameChart/>
+                    <VoucherChart/>
                 </div>
             </div>
         </main>

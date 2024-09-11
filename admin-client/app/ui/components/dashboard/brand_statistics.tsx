@@ -4,7 +4,13 @@ import {
     ClockIcon
 } from '@heroicons/react/24/solid';
 
-export default function BrandStatistics() {
+export default async function BrandStatistics() {
+    function delay(ms: number): Promise<void> {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    await delay(5000);
+
     return (
         <div className="grid grid-cols-1 gap-4 xl:grid-cols-3 md:grid-cols-2">
             <div className="flex flex-col-reverse gap-4 sm:flex-row sm:gap-y-0 justify-between items-center w-full h-auto place-self-center md:h-32 p-6 bg-white rounded-md shadow-md">

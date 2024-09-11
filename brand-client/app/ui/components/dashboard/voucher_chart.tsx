@@ -1,6 +1,12 @@
 import DonutChart from "../donut_chart";
 
-export default function VoucherChart() {
+export default async function VoucherChart() {
+    function delay(ms: number): Promise<void> {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    await delay(5000);
+
     // fake data fetch
     const series: number[] = []
     for (let i = 0; i < 5; i++){

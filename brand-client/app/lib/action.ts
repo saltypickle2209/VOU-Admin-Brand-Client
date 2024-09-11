@@ -4,8 +4,7 @@ import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { cookies } from "next/headers"
 import {string, z} from 'zod'
-
-const baseURL = "http://localhost:8000"
+import { baseURL } from "./definition"
 
 // ---------- VOUCHER SCHEMA ----------
 
@@ -100,7 +99,7 @@ export async function revalidateGames() {
     redirect('/games')
 }
 
-// ---------- CREATE LIVE QUIZ ----------
+// ---------- CREATE LIVE QUIZ (ADDED API, WAIT FOR FULL IMPLEMENTATION) ----------
 
 const liveQuizQuestionSchema = z.object({
     question: z.string({
@@ -348,14 +347,87 @@ export async function createLiveQuiz(prevState: LiveQuizFormState, formData: For
     else {
         console.log("Passed validation")
 
+        const questions = JSON.parse(questionsJSONString)
+        const quizzes = questions.map((item: any) => {
+            const options = [ item.answerA, item.answerB, item.answerC, item.answerD ]
+            const correctAnswer = options[Number(item.correctAnswer)]
+            return ({
+                scriptPreQuestion: "",
+                question: item.question,
+                options: options,
+                correctAnswer: correctAnswer,
+                scriptQuestion: item.scriptPostQuestion,
+                scriptAnswer: item.scriptAnswer
+            })
+        })
+
         // Pack data and send to express server
+        // Send live quiz game's data first
+        const liveQuizFormData = new FormData()
+        liveQuizFormData.append('title', "")
+        liveQuizFormData.append('description', "")
+        liveQuizFormData.append('scriptIntro', formData.get('scriptQuizIntroduction') as string)
+        liveQuizFormData.append('quizzes', JSON.stringify(quizzes))
+
+        console.log(liveQuizFormData)
+        let gameDataID: string = ''
+        try{
+            const response = await fetch(`${baseURL}/quiz/addQuizz`, {
+                method: 'POST',
+                body: liveQuizFormData
+            })
+        
+            if(!response.ok){
+                const errorMessage = await response.text()
+                return {
+                    message: errorMessage
+                }
+            }
+
+            // gameDataId = await response.text()
+        } catch (error) {
+            return {
+                message: "Something went wrong. Try again later."
+            }
+        }
+
+        // After getting game_data_id, send game's data
+        const gameFormData = new FormData()
+        gameFormData.append('poster', formData.get('poster') as Blob)
+        gameFormData.append('name', formData.get('name') as string)
+        gameFormData.append('description', formData.get('description') as string)
+        gameFormData.append('game_type_id', "1")
+        gameFormData.append('game_data_id', "") // <- to be added
+        gameFormData.append('tradable', "false")
+        gameFormData.append('voucher_template_id', formData.get('voucher') as string)
+        gameFormData.append('amount', formData.get('amount') as string)
+        gameFormData.append('start_time', formData.get('startDate') as string)
+        gameFormData.append('end_time', formData.get('endDate') as string)
+
+        try{
+            const response = await fetch(`${baseURL}/game`, {
+                method: 'POST',
+                body: gameFormData
+            })
+        
+            if(!response.ok){
+                const errorMessage = await response.text()
+                return {
+                    message: errorMessage
+                }
+            }
+        } catch (error) {
+            return {
+                message: "Something went wrong. Try again later."
+            }
+        }
 
         revalidatePath('/games')
         redirect('/games')
     }
 }
 
-// ---------- UPDATE LIVE QUIZ ----------
+// ---------- UPDATE LIVE QUIZ (ADDED API, WAITING FOR FULL IMPLEMENTATION) ----------
 
 const updateLiveQuizSchema = z.object({
     poster: z.union([
@@ -518,13 +590,83 @@ export async function updateLiveQuiz(prevState: LiveQuizFormState, formData: For
         console.log("Passed validation")
 
         // Pack data and send to express server
+        const questions = JSON.parse(questionsJSONString)
+        const quizzes = questions.map((item: any) => {
+            const options = [ item.answerA, item.answerB, item.answerC, item.answerD ]
+            const correctAnswer = options[Number(item.correctAnswer)]
+            return ({
+                scriptPreQuestion: "",
+                question: item.question,
+                options: options,
+                correctAnswer: correctAnswer,
+                scriptQuestion: item.scriptPostQuestion,
+                scriptAnswer: item.scriptAnswer
+            })
+        })
+
+        // Update live quiz game's data first
+        const liveQuizFormData = new FormData()
+        liveQuizFormData.append('title', "")
+        liveQuizFormData.append('description', "")
+        liveQuizFormData.append('scriptIntro', formData.get('scriptQuizIntroduction') as string)
+        liveQuizFormData.append('quizzes', JSON.stringify(quizzes))
+
+        // console.log(liveQuizFormData)
+        // try{
+        //     const response = await fetch(`${baseURL}/quiz/addQuizz`, {
+        //         method: 'POST',
+        //         body: liveQuizFormData
+        //     })
+        
+        //     if(!response.ok){
+        //         const errorMessage = await response.text()
+        //         return {
+        //             message: errorMessage
+        //         }
+        //     }
+        // } catch (error) {
+        //     return {
+        //         message: "Something went wrong. Try again later."
+        //     }
+        // }
+
+        // After getting game_data_id, send game's data
+        const gameFormData = new FormData()
+        gameFormData.append('poster', formData.get('poster') as Blob)
+        gameFormData.append('name', formData.get('name') as string)
+        gameFormData.append('description', formData.get('description') as string)
+        gameFormData.append('game_type_id', "1")
+        gameFormData.append('game_data_id', formData.get('gameDataId') as string)
+        gameFormData.append('tradable', "false")
+        gameFormData.append('voucher_template_id', formData.get('voucher') as string)
+        gameFormData.append('amount', formData.get('amount') as string)
+        gameFormData.append('start_time', formData.get('startDate') as string)
+        gameFormData.append('end_time', formData.get('endDate') as string)
+
+        // try{
+        //     const response = await fetch(`${baseURL}/game`, {
+        //         method: 'POST',
+        //         body: gameFormData
+        //     })
+        
+        //     if(!response.ok){
+        //         const errorMessage = await response.text()
+        //         return {
+        //             message: errorMessage
+        //         }
+        //     }
+        // } catch (error) {
+        //     return {
+        //         message: "Something went wrong. Try again later."
+        //     }
+        // }
 
         revalidatePath("/games")
         redirect("/games")
     }
 }
 
-// ---------- CREATE EVENT ----------
+// ---------- CREATE EVENT (ADDED API, WAITING FOR FULL IMPLEMENTATION) ----------
 
 const eventGameSchema = z.object({
     id: z.string({
@@ -662,13 +804,41 @@ export async function createEvent(prevState: EventFormState, formData: FormData)
         console.log("Passed validation")
 
         // Pack data and send to express server
+        const games = JSON.parse(gamesJSONString)
+        const gameIds = games.map((item: any) => (item.id))
+
+        const eventFormData = new FormData()
+        eventFormData.append('poster', formData.get('poster') as Blob)
+        eventFormData.append('name', formData.get('name') as string)
+        eventFormData.append('description', formData.get('description') as string)
+        eventFormData.append('start_time', formData.get('startDate') as string)
+        eventFormData.append('end_time', formData.get('endDate') as string)
+        eventFormData.append('games', JSON.stringify(gameIds))
+
+        try{
+            const response = await fetch(`${baseURL}/event`, {
+                method: 'POST',
+                body: eventFormData
+            })
+        
+            if(!response.ok){
+                const errorMessage = await response.text()
+                return {
+                    message: errorMessage
+                }
+            }
+        } catch (error) {
+            return {
+                message: "Something went wrong. Try again later."
+            }
+        }
 
         revalidatePath("/events")
         redirect("/events")
     }
 }
 
-// ---------- UPDATE EVENT ----------
+// ---------- UPDATE EVENT (ADDED API, WAITING FOR FULL IMPLEMENTATION) ----------
 
 const updateEventSchema = z.object({
     poster: z.union([
@@ -761,20 +931,48 @@ export async function updateEvent(prevState: EventFormState, formData: FormData)
         console.log("Passed validation")
 
         // Pack data and send to express server
+        const games = JSON.parse(gamesJSONString)
+        const gameIds = games.map((item: any) => (item.id))
+
+        const eventFormData = new FormData()
+        eventFormData.append('poster', formData.get('poster') as Blob)
+        eventFormData.append('name', formData.get('name') as string)
+        eventFormData.append('description', formData.get('description') as string)
+        eventFormData.append('start_time', formData.get('startDate') as string)
+        eventFormData.append('end_time', formData.get('endDate') as string)
+        eventFormData.append('games', JSON.stringify(gameIds))
+
+        try{
+            const response = await fetch(`${baseURL}/event/${formData.get('id')}`, {
+                method: 'POST',
+                body: eventFormData
+            })
+        
+            if(!response.ok){
+                const errorMessage = await response.text()
+                return {
+                    message: errorMessage
+                }
+            }
+        } catch (error) {
+            return {
+                message: "Something went wrong. Try again later."
+            }
+        }
 
         revalidatePath("/events")
         redirect("/events")
     }
 }
 
-// ---------- LOGIN ----------
+// ---------- LOGIN (COMPLETED) ----------
 
 const loginSchema = z.object({
     email: z.string({
-        required_error: "Username is required",
-        invalid_type_error: "Username must be a string"
+        required_error: "Email is required",
+        invalid_type_error: "Email must be a string"
     }).trim().min(1, { 
-        message: "Username can't be a whitespace string" 
+        message: "Email can't be a whitespace string" 
     }).email("Invalid email format"),
     password: z.string({
         required_error: "Password is required",
@@ -811,7 +1009,6 @@ export async function logIn(prevState: LoginFormState, formData: FormData): Prom
     }
     else {
         console.log("Passed validation")
-        console.log(`${baseURL}/auth/login`)
 
         try{
             const response = await fetch(`${baseURL}/auth/login`, {
@@ -850,7 +1047,7 @@ export async function logIn(prevState: LoginFormState, formData: FormData): Prom
     }
 }
 
-// ---------- REGISTER ----------
+// ---------- REGISTER (ADDED API, WAITING FOR MORE FIELDS TO BE ADDED IN REGISTER ROUTE) ----------
 
 const registerSchema = z.object({
     name: z.string({
@@ -965,13 +1162,37 @@ export async function register(prevState: RegisterFormState, formData: FormData)
         console.log("Passed validation")
 
         // Pack data and send to express server
+        try{
+            const response = await fetch(`${baseURL}/auth/register`, {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    "name": formData.get('name'),
+                    "email": formData.get('email'),
+                    "password": formData.get('password')
+                })
+            })
+        
+            if(!response.ok){
+                const errorMessage = await response.text()
+                return {
+                    message: errorMessage
+                }
+            }
+        } catch (error) {
+            return {
+                message: "Something went wrong. Try again later."
+            }
+        }
 
         revalidatePath("/login")
         redirect("/login")
     }
 }
 
-// ---------- AI GENERATION ----------
+// ---------- AI GENERATION (COMPLETED) ----------
 
 export async function generatePostQuestionComment(question: string): Promise<string>{
     const prompt = `Help me write a lively comment for this question: "${question}". Note that the answer for this question mustn't be mentioned, the comment must be no longer than 2 sentences or 500 characters and do not enclose the comment in quotation marks.`

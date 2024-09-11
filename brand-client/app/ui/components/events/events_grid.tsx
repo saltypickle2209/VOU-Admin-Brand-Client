@@ -5,59 +5,12 @@ import {
 import clsx from "clsx";
 import { formatDate } from "@/app/lib/utility";
 
-const data = [
-    {
-        id: "1",
-        name: "Something",
-        poster: "https://homepage.momocdn.net/blogscontents/momo-upload-api-220422091342-637862156227500692.jpg",
-        start_time: "2024-08-10",
-        end_time: "2024-08-20"
-    },
-    {
-        id: "2",
-        name: "This is a really really long title so you should see it being ellipsised",
-        poster: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDwmTgq-HCJZfeskytZ1MAJqkjXdBqQi5wVQ&s",
-        start_time: "2024-08-12",
-        end_time: "2024-08-13"
-    },
-    {
-        id: "3",
-        name: "Event 1",
-        poster: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmUbXIH85ZcmIpMRatVL08HSbZSWVdDP5nnw&s",
-        start_time: "2024-08-15",
-        end_time: "2024-08-31"
-    },
-    {
-        id: "4",
-        name: "Event 2",
-        poster: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmUbXIH85ZcmIpMRatVL08HSbZSWVdDP5nnw&s",
-        start_time: "2024-08-24",
-        end_time: "2024-12-31"
-    },
-    {
-        id: "5",
-        name: "Event 3",
-        poster: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmUbXIH85ZcmIpMRatVL08HSbZSWVdDP5nnw&s",
-        start_time: "2024-08-25",
-        end_time: "2024-12-31"
-    },
-    {
-        id: "6",
-        name: "Event 4",
-        poster: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmUbXIH85ZcmIpMRatVL08HSbZSWVdDP5nnw&s",
-        start_time: "2024-08-26",
-        end_time: "2024-12-31"
-    }
-]
-
-export default function EventsGrid({ query, currentPage }: { query: string, currentPage: number }){
-    // fetch data using query & currentPage
-
+export default function EventsGrid({ data }: { data: any }){
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     return (
         <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {data.map((event) => {
+            {data.map((event: any) => {
                 const startDate = new Date(event.start_time)
                 const endDate = new Date(event.end_time)
                 startDate.setHours(0, 0, 0, 0)

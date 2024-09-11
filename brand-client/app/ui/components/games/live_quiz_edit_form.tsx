@@ -15,9 +15,11 @@ import { LiveQuiz, Question } from '@/app/lib/definition';
 import { generateAnswerComment, generatePostQuestionComment, generateQuizIntroduction, LiveQuizFormState, updateLiveQuiz } from '@/app/lib/action';
 
 export default function LiveQuizEditForm({
-    data
+    data,
+    id
 }: {
-    data: LiveQuiz
+    data: LiveQuiz,
+    id: string
 }) {
     const initialState: LiveQuizFormState = { message: null, errors: {} }
     const [state, formAction] = useFormState(updateLiveQuiz, initialState)
@@ -160,6 +162,7 @@ export default function LiveQuizEditForm({
         
         const formData = new FormData()
         if(poster) formData.append('poster', poster)
+        formData.append('id', id)
         formData.append('name', quizName)
         formData.append('description', quizDescription)
         formData.append('voucher', voucher)
