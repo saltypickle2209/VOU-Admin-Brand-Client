@@ -1,4 +1,5 @@
 import { baseURL } from "@/app/lib/definition";
+import { getToken } from "@/app/lib/server_utility";
 import EventDetail from "@/app/ui/components/events/event_detail";
 import LiveQuizDetail from "@/app/ui/components/games/live_quiz_detail";
 import { Metadata } from "next";
@@ -14,7 +15,12 @@ export default async function Page({ params }: { params: { id: string}}) {
     let data: any = null
 
     try{
-        const response = await fetch(`${baseURL}/event/${id}`, { cache: 'no-store' })
+        const response = await fetch(`${baseURL}/event/${id}`, { 
+            cache: 'no-store',
+            headers: {
+                'Authorization': `Bearer ${getToken()}`
+            }
+        })
         if(response.status === 404){
             throw new Error("404")
         }

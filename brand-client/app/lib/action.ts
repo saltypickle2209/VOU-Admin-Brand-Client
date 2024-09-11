@@ -5,6 +5,7 @@ import { redirect } from "next/navigation"
 import { cookies } from "next/headers"
 import {string, z} from 'zod'
 import { baseURL } from "./definition"
+import { getToken } from "./server_utility"
 
 const MAX_FILE_SIZE = 1024 * 1024 * 5;
 const ACCEPTED_FILE_TYPES = ['image/png', 'image/jpg'];
@@ -200,11 +201,12 @@ const liveQuizSchema = z.object({
     startDate: z.string({
         required_error: "Start date is required",
         invalid_type_error: "Start date must be a string"
-    }).date("Invalid start date").refine(date => {
+    }).datetime({ 
+        offset: true,
+        message: "Invalid start date"
+    }).refine(date => {
         const today = new Date()
         const parsedDate = new Date(date)
-        today.setHours(0, 0, 0, 0)
-        parsedDate.setHours(0, 0, 0, 0)
         return parsedDate >= today
     }, {
         message: "Start date must be today or later"
@@ -212,7 +214,10 @@ const liveQuizSchema = z.object({
     endDate: z.string({
         required_error: "End date is required",
         invalid_type_error: "End date must be a string"
-    }).date("Invalid end date"),
+    }).datetime({ 
+        offset: true,
+        message: "Invalid end date"
+    }),
     questions: z.array(liveQuizQuestionSchema).nonempty({
         message: "Question list can't be empty"
     }).max(10, {
@@ -279,8 +284,8 @@ export async function createLiveQuiz(prevState: LiveQuizFormState, formData: For
         description: formData.get('description'),
         voucher: formData.get('voucher'),
         amount: formData.get('amount'),
-        startDate: formData.get('startDate'),
-        endDate: formData.get('endDate'),
+        startDate: formData.get('startDate') + ':00+07:00',
+        endDate: formData.get('endDate') + ':00+07:00',
         questions: JSON.parse(questionsJSONString),
         scriptQuizIntroduction: formData.get('scriptQuizIntroduction')
     })
@@ -349,7 +354,7 @@ export async function createLiveQuiz(prevState: LiveQuizFormState, formData: For
             const options = [ item.answerA, item.answerB, item.answerC, item.answerD ]
             const correctAnswer = options[Number(item.correctAnswer)]
             return ({
-                scriptPreQuestion: "",
+                scriptPreQuestion: "a",
                 question: item.question,
                 options: options,
                 correctAnswer: correctAnswer,
@@ -360,18 +365,20 @@ export async function createLiveQuiz(prevState: LiveQuizFormState, formData: For
 
         // Pack data and send to express server
         // Send live quiz game's data first
-        const liveQuizFormData = new FormData()
-        liveQuizFormData.append('title', "")
-        liveQuizFormData.append('description', "")
-        liveQuizFormData.append('scriptIntro', formData.get('scriptQuizIntroduction') as string)
-        liveQuizFormData.append('quizzes', JSON.stringify(quizzes))
-
-        console.log(liveQuizFormData)
-        let gameDataID: string = ''
+        let gameDataId: string = ''
         try{
             const response = await fetch(`${baseURL}/quiz/addQuizz`, {
                 method: 'POST',
-                body: liveQuizFormData
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${getToken()}`
+                },
+                body: JSON.stringify({
+                    title: "a",
+                    description: "a",
+                    scriptIntro: formData.get('scriptQuizIntroduction') as string,
+                    quizzes: quizzes
+                })
             })
         
             if(!response.ok){
@@ -381,7 +388,7 @@ export async function createLiveQuiz(prevState: LiveQuizFormState, formData: For
                 }
             }
 
-            // gameDataId = await response.text()
+            gameDataId = await response.text()
         } catch (error) {
             return {
                 message: "Something went wrong. Try again later."
@@ -394,16 +401,19 @@ export async function createLiveQuiz(prevState: LiveQuizFormState, formData: For
         gameFormData.append('name', formData.get('name') as string)
         gameFormData.append('description', formData.get('description') as string)
         gameFormData.append('game_type_id', "1")
-        gameFormData.append('game_data_id', "") // <- to be added
+        gameFormData.append('game_data_id', gameDataId)
         gameFormData.append('tradable', "false")
         gameFormData.append('voucher_template_id', formData.get('voucher') as string)
         gameFormData.append('amount', formData.get('amount') as string)
-        gameFormData.append('start_time', formData.get('startDate') as string)
-        gameFormData.append('end_time', formData.get('endDate') as string)
+        gameFormData.append('start_time', formData.get('startDate') as string + ':00+07:00')
+        gameFormData.append('end_time', formData.get('endDate') as string + ':00+07:00')
 
         try{
             const response = await fetch(`${baseURL}/game`, {
                 method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${getToken()}`
+                },
                 body: gameFormData
             })
         
@@ -476,11 +486,17 @@ const updateLiveQuizSchema = z.object({
     startDate: z.string({
         required_error: "Start date is required",
         invalid_type_error: "Start date must be a string"
-    }).date("Invalid start date"),
+    }).datetime({ 
+        offset: true, 
+        message: "Invalid start date"
+    }),
     endDate: z.string({
         required_error: "End date is required",
         invalid_type_error: "End date must be a string"
-    }).date("Invalid end date"),
+    }).datetime({ 
+        offset: true, 
+        message: "Invalid end date"
+    }),
     questions: z.array(liveQuizQuestionSchema).nonempty({
         message: "Question list can't be empty"
     }).max(10, {
@@ -521,8 +537,8 @@ export async function updateLiveQuiz(prevState: LiveQuizFormState, formData: For
         description: formData.get('description'),
         voucher: formData.get('voucher'),
         amount: formData.get('amount'),
-        startDate: formData.get('startDate'),
-        endDate: formData.get('endDate'),
+        startDate: formData.get('startDate') + ':00+07:00',
+        endDate: formData.get('endDate') + ':00+07:00',
         questions: JSON.parse(questionsJSONString),
         scriptQuizIntroduction: formData.get('scriptQuizIntroduction')
     })
@@ -592,7 +608,7 @@ export async function updateLiveQuiz(prevState: LiveQuizFormState, formData: For
             const options = [ item.answerA, item.answerB, item.answerC, item.answerD ]
             const correctAnswer = options[Number(item.correctAnswer)]
             return ({
-                scriptPreQuestion: "",
+                scriptPreQuestion: "a",
                 question: item.question,
                 options: options,
                 correctAnswer: correctAnswer,
@@ -601,18 +617,22 @@ export async function updateLiveQuiz(prevState: LiveQuizFormState, formData: For
             })
         })
 
-        // Update live quiz game's data first
-        const liveQuizFormData = new FormData()
-        liveQuizFormData.append('title', "")
-        liveQuizFormData.append('description', "")
-        liveQuizFormData.append('scriptIntro', formData.get('scriptQuizIntroduction') as string)
-        liveQuizFormData.append('quizzes', JSON.stringify(quizzes))
-
-        // console.log(liveQuizFormData)
+        // Pack data and send to express server
+        // Send live quiz game's data first
+        // let gameDataId: string = ''
         // try{
         //     const response = await fetch(`${baseURL}/quiz/addQuizz`, {
         //         method: 'POST',
-        //         body: liveQuizFormData
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //             'Authorization': `Bearer ${getToken()}`
+        //         },
+        //         body: JSON.stringify({
+        //             title: "a",
+        //             description: "a",
+        //             scriptIntro: formData.get('scriptQuizIntroduction') as string,
+        //             quizzes: quizzes
+        //         })
         //     })
         
         //     if(!response.ok){
@@ -621,6 +641,8 @@ export async function updateLiveQuiz(prevState: LiveQuizFormState, formData: For
         //             message: errorMessage
         //         }
         //     }
+
+        //     gameDataId = await response.text()
         // } catch (error) {
         //     return {
         //         message: "Something went wrong. Try again later."
@@ -637,12 +659,15 @@ export async function updateLiveQuiz(prevState: LiveQuizFormState, formData: For
         gameFormData.append('tradable', "false")
         gameFormData.append('voucher_template_id', formData.get('voucher') as string)
         gameFormData.append('amount', formData.get('amount') as string)
-        gameFormData.append('start_time', formData.get('startDate') as string)
-        gameFormData.append('end_time', formData.get('endDate') as string)
+        gameFormData.append('start_time', formData.get('startDate') as string + ':00+07:00')
+        gameFormData.append('end_time', formData.get('endDate') as string + ':00+07:00')
 
         // try{
         //     const response = await fetch(`${baseURL}/game`, {
         //         method: 'POST',
+        //         headers: {
+        //             'Authorization': `Bearer ${getToken()}`
+        //         },
         //         body: gameFormData
         //     })
         
@@ -815,6 +840,9 @@ export async function createEvent(prevState: EventFormState, formData: FormData)
         try{
             const response = await fetch(`${baseURL}/event`, {
                 method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${getToken()}`
+                },
                 body: eventFormData
             })
         
@@ -1030,7 +1058,6 @@ export async function logIn(prevState: LoginFormState, formData: FormData): Prom
             //console.log(data.token)
             
             cookies().set('token', data.token, {
-                httpOnly: true,
                 maxAge: 60 * 60
             })
         } catch (error) {

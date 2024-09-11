@@ -1,7 +1,7 @@
 import { baseURL, Game } from "@/app/lib/definition";
 import Link from 'next/link';
 import GameList from './game_list';
-import { getDatePart } from '@/app/lib/utility';
+import { getClientSideToken, getDatePart } from '@/app/lib/utility';
 import {
     CubeTransparentIcon,
     ArrowLongRightIcon
@@ -26,7 +26,11 @@ export default function ChooseGameModalContent({
     // fetch game's data and parse to Game[]
     useEffect(() => {
         async function fetchGames() {
-            let res = await fetch(`${baseURL}/game/all`)
+            let res = await fetch(`${baseURL}/game/all`, {
+                headers: {
+                    'Authorization': `Bearer ${getClientSideToken()}`
+                }
+            })
             let data = await res.json()
 
             const formattedData: Game[] = data.map((item: any) => ({
