@@ -3,6 +3,7 @@ import { ChevronRightIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import Pagination from "./pagination";
 import { baseURL } from "@/app/lib/definition";
+import { getToken } from "@/app/lib/server_utility";
 
 const testURL = "http://localhost:3020";
 
@@ -98,12 +99,17 @@ export default async function VouchersTable({
 }) {
   let data: any = null;
   try {
-    // const response = await fetch(
-    //   `${baseURL}/voucher/voucherTemplate/search?page=${currentPage}&search=${query}`
-    // );
     const response = await fetch(
-      `${testURL}/voucherTemplate/search?page=${currentPage}&search=${query}`
+      `${baseURL}/voucher/voucherTemplate/search?page=${currentPage}&search=${query}`,
+      {
+        headers: {
+          Authorization: `Bearer ${getToken}`,
+        },
+      }
     );
+    // const response = await fetch(
+    //   `${testURL}/voucherTemplate/search?page=${currentPage}&search=${query}`
+    // );
     console.log(query);
     console.log(currentPage);
     if (!response.ok) {
