@@ -65,7 +65,7 @@ const data: User[] = [
     },
 ]
 
-export default function UsersList({ query, currentPage }: { query: string, currentPage: number }){
+export default function UsersList({ data }: { data: any }){
     // fetch data using query & currentPage
     
     return (
@@ -85,7 +85,7 @@ export default function UsersList({ query, currentPage }: { query: string, curre
                 </div>
             </div>
 
-            {data.map((user) => {
+            {data.data.map((user: any) => {
                 return (
                     <div key={user.id} className="bg-white p-4 grid grid-cols-4 grid-flow-row-dense items-center md:grid-cols-9 gap-y-4">
                         <div className="col-span-3 flex items-center gap-x-2 pr-2 md:col-span-4">

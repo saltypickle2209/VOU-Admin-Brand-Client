@@ -43,6 +43,7 @@ export default function UserEditForm({ data }: { data: User }) {
     formData.append("role", role);
     if (dob) formData.append("dob", dob);
     if (gender) formData.append("gender", gender);
+    formData.append("status", data.status)
 
     formAction(formData);
   };

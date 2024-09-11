@@ -5,6 +5,7 @@ import { redirect } from "next/navigation"
 import { z } from "zod"
 import { baseURL } from "./definition"
 import { cookies } from "next/headers"
+import { getToken } from "./server_utility"
 
 export async function revalidateDashboard() {
     revalidatePath('/dashboard')
@@ -194,6 +195,34 @@ export async function editUser(prevState: UserEditFormState, formData: FormData)
         console.log("Passed validation")
 
         // Pack data and send to express server
+        try{
+            const response = await fetch(`${baseURL}/auth/users/edit/${formData.get('id') as string}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${getToken()}`
+                },
+                body: JSON.stringify({
+                    name: formData.get('name'),
+                    email: formData.get('email'),
+                    username: formData.get('username'),
+                    role: formData.get('role'),
+                    phone: formData.get('phone'),
+                    status: formData.get('status')
+                })
+            })
+        
+            if(!response.ok){
+                const errorMessage = await response.text()
+                return {
+                    message: errorMessage
+                }
+            }
+        } catch (error) {
+            return {
+                message: "Something went wrong. Try again later."
+            }
+        }
 
         revalidatePath("/users")
         redirect("/users")
@@ -330,6 +359,25 @@ export async function editBrand(prevState: BrandEditFormState, formData: FormDat
 export async function toggleUserActivation(userId: string) {
     console.log("toggle activation")
     // send request to express server
+    try{
+        const response = await fetch(`${baseURL}/auth/users/toggleUser/${userId}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${getToken()}`
+            }
+        })
+    
+        if(!response.ok){
+            const errorMessage = await response.text()
+            return {
+                message: errorMessage
+            }
+        }
+    } catch (error) {
+        return {
+            message: "Something went wrong. Try again later."
+        }
+    }
 
     revalidatePath("/users")
     redirect("/users")

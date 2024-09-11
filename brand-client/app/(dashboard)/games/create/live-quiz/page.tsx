@@ -9,25 +9,25 @@ export const metadata: Metadata = {
 
 export default async function Page() {
     // fetch voucher list
-    let voucherData: any = null
+    // let voucherData: any = null
 
-    try{
-        const response = await fetch(`${baseURL}/voucher/voucherTemplate/getAll`, { 
-            cache: 'no-store',
-            headers: {
-                'Authorization': `Bearer ${getToken()}`
-            }
-        })
-        if(!response.ok){
-            throw new Error()
-        }
-        voucherData = await response.json()
-    }
-    catch (error){
-        throw new Error('Something went wrong')
-    }
+    // try{
+    //     const response = await fetch(`${baseURL}/voucher/voucherTemplate/getAll`, { 
+    //         cache: 'no-store',
+    //         headers: {
+    //             'Authorization': `Bearer ${getToken()}`
+    //         }
+    //     })
+    //     if(!response.ok){
+    //         throw new Error()
+    //     }
+    //     voucherData = await response.json()
+    // }
+    // catch (error){
+    //     throw new Error('Something went wrong')
+    // }
 
-    console.log(voucherData)
+    // console.log(voucherData)
 
     return (
         <main className="flex flex-col gap-y-4">
