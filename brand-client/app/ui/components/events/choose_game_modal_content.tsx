@@ -26,28 +26,35 @@ export default function ChooseGameModalContent({
     // fetch game's data and parse to Game[]
     useEffect(() => {
         async function fetchGames() {
-            let res = await fetch(`${baseURL}/game/all`, {
+            let res = await fetch(`${baseURL}/game/noEvent/upcoming`, {
                 headers: {
                     'Authorization': `Bearer ${getClientSideToken()}`
                 }
             })
-            let data = await res.json()
 
-            const formattedData: Game[] = data.map((item: any) => ({
-                id: item.id,
-                poster: item.poster,
-                name: item.name,
-                description: item.description,
-                start_date: getDatePart(item.start_time),
-                end_date: getDatePart(item.end_time),
-                game_type_id: item.game_type_id,
-                voucher: item.voucher_template_id,
-                amount: item.amount
-            }))
+            if(!res.ok) {
+                setIsEmpty(true)
+                setIsFetching(false)
+            }
+            else {
+                let data = await res.json()
+    
+                const formattedData: Game[] = data.games.map((item: any) => ({
+                    id: item.id,
+                    poster: item.poster,
+                    name: item.name,
+                    description: item.description,
+                    start_date: getDatePart(item.start_time),
+                    end_date: getDatePart(item.end_time),
+                    game_type_id: item.game_type_id,
+                    voucher: item.voucher_template_id,
+                    amount: item.amount
+                }))
 
-            setGameData(formattedData)
-            setIsEmpty(data.length === 0)
-            setIsFetching(false)
+                setGameData(formattedData)
+                setIsEmpty(data.length === 0)
+                setIsFetching(false)
+            }
         }
         fetchGames()
     }, [])

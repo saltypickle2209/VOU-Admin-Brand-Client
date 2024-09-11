@@ -3,9 +3,10 @@ import {
     ChatBubbleBottomCenterTextIcon
 } from '@heroicons/react/24/outline';
 import BasicInformation from './basic_information';
+import clsx from 'clsx';
 
 // remember to add prop to this one
-export default function LiveQuizDetail({ data }: { data: any }){
+export default function LiveQuizDetail({ data, gameData }: { data: any, gameData: any }){
     return (
         <div className="w-full px-6 grid grid-cols-1 divide-y-2 divide-gray-300 lg:py-6 lg:px-0 lg:divide-y-0 lg:divide-x-2 lg:grid-cols-2 bg-white rounded-md shadow-md">
             <BasicInformation data={data}/>
@@ -19,62 +20,60 @@ export default function LiveQuizDetail({ data }: { data: any }){
                         <ChatBubbleBottomCenterTextIcon className="w-5"/>
                         <p className="text-sm font-semibold">Quiz's introduction</p>
                     </div>
-                    <p className="text-gray-500 text-xs">Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, soluta?</p>
+                    <p className="text-gray-500 text-xs">{gameData.scriptIntro.text}</p>
                 </div>
-                <div className="w-full flex flex-col gap-y-4 rounded-md p-6 shadow-md">
-                    <p className="text-sm font-semibold text-gray-950">Question #1</p>
-                    <p className="font-semibold text-gray-950">What is the capital of France?</p>
-                    <div className="grid grid-cols-2 gap-2">
-                        <div className="py-2 px-4 bg-green-500 text-sm text-violet-50 rounded-md font-semibold">A. Paris</div>
-                        <div className="py-2 px-4 bg-red-500 text-sm text-violet-50 rounded-md font-semibold">B. Pickleland</div>
-                        <div className="py-2 px-4 bg-red-500 text-sm text-violet-50 rounded-md font-semibold">C. You</div>
-                        <div className="py-2 px-4 bg-red-500 text-sm text-violet-50 rounded-md font-semibold">D. Nah</div>
+                {gameData.quizzes.map((quiz: any) => (
+                    <div key={quiz._id} className="w-full flex flex-col gap-y-4 rounded-md p-6 shadow-md">
+                        <p className="text-sm font-semibold text-gray-950">Question #1</p>
+                        <p className="font-semibold text-gray-950">{quiz.question}</p>
+                        <div className="grid grid-cols-2 gap-2">
+                            <div className={clsx(
+                                "py-2 px-4  text-sm text-violet-50 rounded-md font-semibold", 
+                                {
+                                    "bg-green-500": quiz.options[0] === quiz.correctAnswer,
+                                    "bg-red-500": quiz.options[0] !== quiz.correctAnswer
+                                }
+                            )}>
+                            {`A. ${quiz.options[0]}`}
+                            </div>
+                            <div className={clsx(
+                                "py-2 px-4  text-sm text-violet-50 rounded-md font-semibold", 
+                                {
+                                    "bg-green-500": quiz.options[1] === quiz.correctAnswer,
+                                    "bg-red-500": quiz.options[1] !== quiz.correctAnswer
+                                }
+                            )}>
+                            {`B. ${quiz.options[1]}`}
+                            </div>
+                            <div className={clsx(
+                                "py-2 px-4  text-sm text-violet-50 rounded-md font-semibold", 
+                                {
+                                    "bg-green-500": quiz.options[2] === quiz.correctAnswer,
+                                    "bg-red-500": quiz.options[2] !== quiz.correctAnswer
+                                }
+                            )}>
+                            {`C. ${quiz.options[3]}`}
+                            </div>
+                            <div className={clsx(
+                                "py-2 px-4  text-sm text-violet-50 rounded-md font-semibold", 
+                                {
+                                    "bg-green-500": quiz.options[3] === quiz.correctAnswer,
+                                    "bg-red-500": quiz.options[3] !== quiz.correctAnswer
+                                }
+                            )}>
+                            {`D. ${quiz.options[3]}`}
+                            </div>
+                        </div>
+                        <div className="flex flex-col gap-y-2">
+                            <p className="text-sm font-semibold text-gray-950">Post-question comment</p>
+                            <p className="text-gray-500 text-xs">{quiz.scriptQuestion.text}</p>
+                        </div>
+                        <div className="flex flex-col gap-y-2">
+                            <p className="text-sm font-semibold text-gray-950">Answer comment</p>
+                            <p className="text-gray-500 text-xs">{quiz.scriptAnswer.text}</p>
+                        </div>
                     </div>
-                    <div className="flex flex-col gap-y-2">
-                        <p className="text-sm font-semibold text-gray-950">Post-question comment</p>
-                        <p className="text-gray-500 text-xs">Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, soluta?</p>
-                    </div>
-                    <div className="flex flex-col gap-y-2">
-                        <p className="text-sm font-semibold text-gray-950">Answer comment</p>
-                        <p className="text-gray-500 text-xs">Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, soluta?</p>
-                    </div>
-                </div>
-                <div className="w-full flex flex-col gap-y-4 rounded-md p-6 shadow-md">
-                    <p className="text-sm font-semibold text-gray-950">Question #2</p>
-                    <p className="font-semibold text-gray-950">What is the capital of France?</p>
-                    <div className="grid grid-cols-2 gap-2">
-                        <div className="py-2 px-4 bg-red-500 text-sm text-violet-50 rounded-md font-semibold">A. Paris</div>
-                        <div className="py-2 px-4 bg-green-500 text-sm text-violet-50 rounded-md font-semibold">B. Pickleland</div>
-                        <div className="py-2 px-4 bg-red-500 text-sm text-violet-50 rounded-md font-semibold">C. You</div>
-                        <div className="py-2 px-4 bg-red-500 text-sm text-violet-50 rounded-md font-semibold">D. Nah</div>
-                    </div>
-                    <div className="flex flex-col gap-y-2">
-                        <p className="text-sm font-semibold text-gray-950">Post-question comment</p>
-                        <p className="text-gray-500 text-xs">Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, soluta?</p>
-                    </div>
-                    <div className="flex flex-col gap-y-2">
-                        <p className="text-sm font-semibold text-gray-950">Answer comment</p>
-                        <p className="text-gray-500 text-xs">Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, soluta?</p>
-                    </div>
-                </div>
-                <div className="w-full flex flex-col gap-y-4 rounded-md p-6 shadow-md">
-                    <p className="text-sm font-semibold text-gray-950">Question #3</p>
-                    <p className="font-semibold text-gray-950">What is the capital of France?</p>
-                    <div className="grid grid-cols-2 gap-2">
-                        <div className="py-2 px-4 bg-red-500 text-sm text-violet-50 rounded-md font-semibold">A. Paris</div>
-                        <div className="py-2 px-4 bg-red-500 text-sm text-violet-50 rounded-md font-semibold">B. Pickleland</div>
-                        <div className="py-2 px-4 bg-green-500 text-sm text-violet-50 rounded-md font-semibold">C. You</div>
-                        <div className="py-2 px-4 bg-red-500 text-sm text-violet-50 rounded-md font-semibold">D. Nah</div>
-                    </div>
-                    <div className="flex flex-col gap-y-2">
-                        <p className="text-sm font-semibold text-gray-950">Post-question comment</p>
-                        <p className="text-gray-500 text-xs">Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, soluta?</p>
-                    </div>
-                    <div className="flex flex-col gap-y-2">
-                        <p className="text-sm font-semibold text-gray-950">Answer comment</p>
-                        <p className="text-gray-500 text-xs">Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, soluta?</p>
-                    </div>
-                </div>
+                ))}
             </div>
         </div>
     )

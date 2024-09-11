@@ -3,7 +3,6 @@ import { getToken } from "@/app/lib/server_utility"
 
 export default async function GameType({ game_type_id }: {game_type_id: any}) {
     let data: any = null
-    console.log("Game type:" + game_type_id)
     
     try{
         const response = await fetch(`${baseURL}/game/gametype/${game_type_id}`, {

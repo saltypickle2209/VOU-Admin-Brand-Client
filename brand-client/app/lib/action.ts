@@ -388,7 +388,7 @@ export async function createLiveQuiz(prevState: LiveQuizFormState, formData: For
                 }
             }
 
-            gameDataId = await response.text()
+            gameDataId = await response.json()
         } catch (error) {
             return {
                 message: "Something went wrong. Try again later."
@@ -691,7 +691,7 @@ export async function updateLiveQuiz(prevState: LiveQuizFormState, formData: For
 // ---------- CREATE EVENT (ADDED API, WAITING FOR FULL IMPLEMENTATION) ----------
 
 const eventGameSchema = z.object({
-    id: z.string({
+    id: z.number({
         required_error: "Invalid data",
         invalid_type_error: "Invalid data"
     }),
@@ -717,15 +717,15 @@ const eventGameSchema = z.object({
         required_error: "Invalid data",
         invalid_type_error: "Invalid data"
     }),
-    game_type_id: z.string({
+    game_type_id: z.number({
         required_error: "Invalid data",
         invalid_type_error: "Invalid data"
     }),
-    voucher: z.string({
+    voucher: z.number({
         required_error: "Invalid data",
         invalid_type_error: "Invalid data"
     }),
-    amount: z.string({
+    amount: z.number({
         required_error: "Invalid data",
         invalid_type_error: "Invalid data"
     })
@@ -835,7 +835,7 @@ export async function createEvent(prevState: EventFormState, formData: FormData)
         eventFormData.append('description', formData.get('description') as string)
         eventFormData.append('start_time', formData.get('startDate') as string)
         eventFormData.append('end_time', formData.get('endDate') as string)
-        eventFormData.append('games', JSON.stringify(gameIds))
+        eventFormData.append('gameIds', JSON.stringify(gameIds))
 
         try{
             const response = await fetch(`${baseURL}/event`, {
