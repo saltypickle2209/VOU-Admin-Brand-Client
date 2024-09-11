@@ -2,8 +2,11 @@ import Link from "next/link";
 import { ChevronRightIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import Pagination from "./pagination";
+import { baseURL } from "@/app/lib/definition";
 
-const data = [
+const testURL = "http://localhost:3020";
+
+const sampleData = [
   {
     id: "voucher 1",
     name: "Voucher Gold",
@@ -86,13 +89,36 @@ const data = [
   },
 ];
 
-export default function VouchersTable({
+export default async function VouchersTable({
   query,
   currentPage,
 }: {
   query: string;
   currentPage: number;
 }) {
+  let data: any = null;
+  try {
+    // const response = await fetch(
+    //   `${baseURL}/voucher/voucherTemplate/search?page=${currentPage}&search=${query}`
+    // );
+    const response = await fetch(
+      `${testURL}/voucherTemplate/search?page=${currentPage}&search=${query}`
+    );
+    console.log(query);
+    console.log(currentPage);
+    if (!response.ok) {
+      throw new Error("Fetch khong dc :)");
+    }
+    data = await response.json();
+    console.log(data);
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error("Cannot fetch: " + error.message);
+    } else {
+      throw new Error("Unknown error");
+    }
+  }
+  const totalPages = data.totalPages;
   return (
     <div className="flex flex-col w-full space-y-4 p-6 bg-white rounded-md shadow-md">
       <div className="flex justify-between items-center">
@@ -123,7 +149,7 @@ export default function VouchersTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-300 divide-dashed">
-            {data.map((item) => {
+            {data.data.map((item: any) => {
               return (
                 <tr
                   key={item.id}
@@ -135,11 +161,11 @@ export default function VouchersTable({
                     <Image
                       src={`/${item.image}`}
                       alt={item.name}
-                      width={200}
-                      height={200}
+                      width={150}
+                      height={150}
                     />
                   </td>
-                  <td className="px-6 py-4 text-center">{item.description}</td>
+                  <td className="text-center">{item.description}</td>
                   <td className="px-6 py-4 text-right">{item.value}</td>
                 </tr>
               );
@@ -147,7 +173,7 @@ export default function VouchersTable({
           </tbody>
         </table>
       </div>
-      <Pagination totalPages={3} />
+      <Pagination totalPages={totalPages} />
     </div>
   );
 }

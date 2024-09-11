@@ -1,6 +1,7 @@
 "use client";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React from "react";
+import { useDebouncedCallback } from "use-debounce";
 
 export default function SearchVoucher({
   placeholder,
@@ -10,16 +11,28 @@ export default function SearchVoucher({
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
-  const handleSearch = (term: string) => {
+  // const handleSearch = (term: string) => {
+  //   console.log(term);
+  //   const params = new URLSearchParams(searchParams);
+  //   if (term) {
+  //     params.set("name", term);
+  //   } else {
+  //     params.delete("name");
+  //   }
+  //   replace(`${pathname}?${params.toString()}`);
+  // };
+
+  const handleSearch = useDebouncedCallback((term) => {
     console.log(term);
     const params = new URLSearchParams(searchParams);
+    params.set("page", "1");
     if (term) {
-      params.set("name", term);
+      params.set("query", term);
     } else {
-      params.delete("name");
+      params.delete("query");
     }
     replace(`${pathname}?${params.toString()}`);
-  };
+  }, 300);
 
   return (
     <form className=" max-w-full">
