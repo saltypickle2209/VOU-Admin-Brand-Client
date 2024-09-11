@@ -97,7 +97,7 @@ export async function revalidateGames() {
     redirect('/games')
 }
 
-// ---------- CREATE LIVE QUIZ (ADDED API, WAIT FOR FULL IMPLEMENTATION) ----------
+// ---------- CREATE LIVE QUIZ (COMPLETED) ----------
 
 const liveQuizQuestionSchema = z.object({
     question: z.string({
@@ -688,7 +688,7 @@ export async function updateLiveQuiz(prevState: LiveQuizFormState, formData: For
     }
 }
 
-// ---------- CREATE EVENT (ADDED API, WAITING FOR FULL IMPLEMENTATION) ----------
+// ---------- CREATE EVENT (COMPLETED) ----------
 
 const eventGameSchema = z.object({
     id: z.number({
@@ -1293,7 +1293,7 @@ export async function generateQuizIntroduction(prompt: string): Promise<string>{
     return data.choices[0].message.content.trim();
 }
 
-// ---------- ITEM COLLECTING ----------
+// ---------- ITEM COLLECTING (COMPLETED) ----------
 
 const collectableItemSchema = z.object({
     name: z.string({
@@ -1620,6 +1620,73 @@ export async function createItemCollecting(prevState: ItemCollectingFormState, f
         console.log("Passed validation")
 
         // Pack data and send to express server
+        // Send item collecting game's data first
+        const gameDataFormData = new FormData()
+        gameDataFormData.append('img_1', formData.get('item_image_1') as Blob)
+        gameDataFormData.append('img_2', formData.get('item_image_2') as Blob)
+        gameDataFormData.append('img_3', formData.get('item_image_3') as Blob)
+        gameDataFormData.append('img_4', formData.get('item_image_4') as Blob)
+        gameDataFormData.append('img_5', formData.get('item_image_5') as Blob)
+        gameDataFormData.append('img_6', formData.get('item_image_6') as Blob)
+        gameDataFormData.append('items', itemsJSONString)
+        gameDataFormData.append('itemSets', itemSetsJSONString)
+        let gameDataId: string = ''
+        try{
+            const response = await fetch(`${baseURL}/gacha/create`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${getToken()}`
+                },
+                body: gameDataFormData
+            })
+        
+            if(!response.ok){
+                const errorMessage = await response.text()
+                return {
+                    message: errorMessage
+                }
+            }
+
+            gameDataId = await response.json()
+        } catch (error) {
+            return {
+                message: "Something went wrong. Try again later."
+            }
+        }
+
+        // After getting game_data_id, send game's data
+        const gameFormData = new FormData()
+        gameFormData.append('poster', formData.get('poster') as Blob)
+        gameFormData.append('name', formData.get('name') as string)
+        gameFormData.append('description', formData.get('description') as string)
+        gameFormData.append('game_type_id', "2")
+        gameFormData.append('game_data_id', gameDataId)
+        gameFormData.append('tradable', "true")
+        gameFormData.append('voucher_template_id', formData.get('voucher') as string)
+        gameFormData.append('amount', formData.get('amount') as string)
+        gameFormData.append('start_time', formData.get('startDate') as string)
+        gameFormData.append('end_time', formData.get('endDate') as string)
+
+        try{
+            const response = await fetch(`${baseURL}/game`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${getToken()}`
+                },
+                body: gameFormData
+            })
+        
+            if(!response.ok){
+                const errorMessage = await response.text()
+                return {
+                    message: errorMessage
+                }
+            }
+        } catch (error) {
+            return {
+                message: "Something went wrong. Try again later."
+            }
+        }
 
         revalidatePath('/games')
         redirect('/games')
