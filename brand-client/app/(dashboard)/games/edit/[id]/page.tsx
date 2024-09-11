@@ -78,7 +78,7 @@ export default async function Page({ params }: { params: { id: string }}){
             answerB: quiz.options[1],
             answerC: quiz.options[2],
             answerD: quiz.options[3],
-            correctAnswer: quiz.options.indexOf(quiz.correctAnswer),
+            correctAnswer: quiz.options.indexOf(quiz.correctAnswer).toString(),
             scriptPostQuestion: quiz.scriptQuestion.text,
             scriptAnswer: quiz.scriptAnswer.text
         }))
@@ -174,7 +174,7 @@ export default async function Page({ params }: { params: { id: string }}){
                 <main className="flex flex-col gap-y-4">
                     <h1 className="text-3xl font-bold text-gray-950">✏️ Edit your game</h1>
                     <p className="text-sm text-gray-500 hidden md:block">Make changes and submit the form below to update this game item</p>
-                    {gameTypeId === 1 && <LiveQuizEditForm data={gameFullData} id={id}/>}
+                    {gameTypeId === 1 && <LiveQuizEditForm data={gameFullData} id={id} gameDataId={data.game_data_id}/>}
                     {gameTypeId === 2 && <ItemCollectingEditForm data={dummyItemCollecting} id={id} gameDataId={data.game_data_id}/>}
                 </main>
             )}

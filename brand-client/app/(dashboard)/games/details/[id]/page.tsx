@@ -122,7 +122,6 @@ export default async function Page({ params }: { params: { id: string}}) {
                 throw error
             }
         }
-        console.log(gameData)
     }
     
     
