@@ -75,6 +75,33 @@ export async function createVoucher(prevState: any, formData: FormData) {
             // }
         };
     }
+    try {
+        const response = await fetch(`${baseURL}/voucher/voucherTemplate/add`, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${getToken()}`
+            },
+            body: JSON.stringify({
+                name: formData.get("voucherName"),
+                value: formData.get("value"),
+                description: formData.get("description"),
+                image: formData.get("image")    
+            })
+        })
+        if(!response.ok) {
+            const errorMessage = await response.text()
+            return {
+                message: errorMessage
+            }
+        }
+    } catch(error) {
+        if(error instanceof Error) {
+            throw new Error("Cannot add voucher: " + error.message);
+        } else {
+            throw new Error("Unknown error add voucher");
+        }
+    }
 
     return {
         message: "success",
