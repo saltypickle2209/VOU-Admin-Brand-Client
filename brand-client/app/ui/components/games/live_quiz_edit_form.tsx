@@ -16,10 +16,12 @@ import { generateAnswerComment, generatePostQuestionComment, generateQuizIntrodu
 
 export default function LiveQuizEditForm({
     data,
-    id
+    id,
+    gameDataId
 }: {
     data: LiveQuiz,
-    id: string
+    id: string,
+    gameDataId: string
 }) {
     const initialState: LiveQuizFormState = { message: null, errors: {} }
     const [state, formAction] = useFormState(updateLiveQuiz, initialState)
@@ -163,6 +165,7 @@ export default function LiveQuizEditForm({
         const formData = new FormData()
         if(poster) formData.append('poster', poster)
         formData.append('id', id)
+        formData.append('gameDataId', gameDataId)
         formData.append('name', quizName)
         formData.append('description', quizDescription)
         formData.append('voucher', voucher)

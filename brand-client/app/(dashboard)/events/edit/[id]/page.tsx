@@ -45,7 +45,12 @@ export default async function Page({ params }: { params: { id: string }}){
     let gameData: any = null
 
     try{
-        const response = await fetch(`${baseURL}/game/event/${data.id}`, { cache: 'no-store' })
+        const response = await fetch(`${baseURL}/game/event/${data.id}`, { 
+            cache: 'no-store',
+            headers: {
+                'Authorization': `Bearer ${getToken()}`
+            }
+        })
         if(response.status === 404){
             throw new Error("404")
         }

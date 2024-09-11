@@ -67,7 +67,62 @@ export default async function Page({ params }: { params: { id: string}}) {
             }
         }
     }
+    else if(gameTypeId === 2) {
+        gameData = {
+            items: [],
+            itemSets: []
+        }
 
+        try{
+            const response = await fetch(`${baseURL}/gacha/itemsByGame/${data.game_data_id}`, { 
+                cache: 'no-store',
+                headers: {
+                    'Authorization': `Bearer ${getToken()}`
+                } 
+            })
+            if(response.status === 404){
+                throw new Error("404")
+            }
+            if(!response.ok){
+                throw new Error("Something went wrong")
+            }
+            const items = await response.json()
+            gameData.items = items.items
+        }
+        catch (error: any){
+            if(error.message === "404"){
+                notFound()
+            }
+            else{
+                throw error
+            }
+        }
+
+        try{
+            const response = await fetch(`${baseURL}/gacha/itemSetByGameID/${data.game_data_id}`, { 
+                cache: 'no-store',
+                headers: {
+                    'Authorization': `Bearer ${getToken()}`
+                } 
+            })
+            if(response.status === 404){
+                throw new Error("404")
+            }
+            if(!response.ok){
+                throw new Error("Something went wrong")
+            }
+            const itemSets = await response.json()
+            gameData.itemSets = itemSets.itemSets
+        }
+        catch (error: any){
+            if(error.message === "404"){
+                notFound()
+            }
+            else{
+                throw error
+            }
+        }
+    }
     
     
     return (
@@ -75,7 +130,7 @@ export default async function Page({ params }: { params: { id: string}}) {
             <h1 className="text-3xl font-bold text-gray-950">🎮 Game's detail</h1>
             <p className="text-sm text-gray-500 hidden md:block">You can view some basic information of your created game here</p>
             {gameTypeId === 1 && <LiveQuizDetail data={data} gameData={gameData}/>}
-            {gameTypeId === 2 && <ItemCollectingDetail data={data}/>}
+            {gameTypeId === 2 && <ItemCollectingDetail data={data} gameData={gameData}/>}
         </main>
     )
 }

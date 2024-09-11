@@ -78,7 +78,7 @@ export default async function Page({ params }: { params: { id: string }}){
             answerB: quiz.options[1],
             answerC: quiz.options[2],
             answerD: quiz.options[3],
-            correctAnswer: quiz.options.indexOf(quiz.correctAnswer),
+            correctAnswer: quiz.options.indexOf(quiz.correctAnswer).toString(),
             scriptPostQuestion: quiz.scriptQuestion.text,
             scriptAnswer: quiz.scriptAnswer.text
         }))
@@ -95,66 +95,97 @@ export default async function Page({ params }: { params: { id: string }}){
             scriptQuizIntroduction: gameData.scriptIntro.text
         }
     }
+    else if(gameTypeId === 2){
+        gameData = {
+            items: [],
+            itemSets: []
+        }
+
+        try{
+            const response = await fetch(`${baseURL}/gacha/itemsByGame/${data.game_data_id}`, { 
+                cache: 'no-store',
+                headers: {
+                    'Authorization': `Bearer ${getToken()}`
+                } 
+            })
+            if(response.status === 404){
+                throw new Error("404")
+            }
+            if(!response.ok){
+                throw new Error("Something went wrong")
+            }
+            const items = await response.json()
+            gameData.items = items.items
+        }
+        catch (error: any){
+            if(error.message === "404"){
+                notFound()
+            }
+            else{
+                throw error
+            }
+        }
+
+        try{
+            const response = await fetch(`${baseURL}/gacha/itemSetByGameID/${data.game_data_id}`, { 
+                cache: 'no-store',
+                headers: {
+                    'Authorization': `Bearer ${getToken()}`
+                } 
+            })
+            if(response.status === 404){
+                throw new Error("404")
+            }
+            if(!response.ok){
+                throw new Error("Something went wrong")
+            }
+            const itemSets = await response.json()
+            gameData.itemSets = itemSets.itemSets
+        }
+        catch (error: any){
+            if(error.message === "404"){
+                notFound()
+            }
+            else{
+                throw error
+            }
+        }
+
+        const gameIds = gameData.items.map((item: any) => (item._id))
+        const items = gameData.items.map((item: any) => ({
+            _id: item._id,
+            image: item.img,
+            name: item.name,
+            description: item.description,
+            ratio: item.ratio
+        }))
+        const itemSets = gameData.itemSets.map((set: any) => {
+            const itemIndexes = set.items.map((id: any) => (gameIds.indexOf(id).toString()))
+            return ({
+                _id: set._id,
+                name: set.name,
+                description: set.description,
+                items: itemIndexes
+            })
+        })
+
+        gameFullData = {
+            poster: data.poster,
+            name: data.name,
+            description: data.description,
+            voucher: "2",
+            amount: data.amount,
+            startDate: getDatePart(data.start_time),
+            endDate: getDatePart(data.end_time),
+            items: items,
+            itemSets: itemSets
+        }
+    }
 
     const today = new Date()
     const startDate = new Date(data.start_time)
     today.setHours(0, 0, 0, 0)
     startDate.setHours(0, 0, 0, 0)
-
-    const dummyItemCollecting: ItemCollecting = {
-        poster: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmUbXIH85ZcmIpMRatVL08HSbZSWVdDP5nnw&s",
-        name: "Some text",
-        description: "Something",
-        voucher: "2",
-        amount: "500",
-        startDate: "2024-08-13",
-        endDate: "2024-10-13",
-        items: [
-            {
-                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmUbXIH85ZcmIpMRatVL08HSbZSWVdDP5nnw&s",
-                name: "Item 1",
-                description: "Description 1",
-                ratio: "25"
-            },
-            {
-                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmUbXIH85ZcmIpMRatVL08HSbZSWVdDP5nnw&s",
-                name: "Item 2",
-                description: "Description 2",
-                ratio: "50"
-            },
-            {
-                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmUbXIH85ZcmIpMRatVL08HSbZSWVdDP5nnw&s",
-                name: "Item 3",
-                description: "Description 3",
-                ratio: "50"
-            },
-            {
-                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmUbXIH85ZcmIpMRatVL08HSbZSWVdDP5nnw&s",
-                name: "Item 4",
-                description: "Description 4",
-                ratio: "50"
-            },
-            {
-                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmUbXIH85ZcmIpMRatVL08HSbZSWVdDP5nnw&s",
-                name: "Item 5",
-                description: "Description 5",
-                ratio: "100"
-            },
-            {
-                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmUbXIH85ZcmIpMRatVL08HSbZSWVdDP5nnw&s",
-                name: "Item 6",
-                description: "Description 6",
-                ratio: "1000"
-            }
-        ],
-        itemSets: [
-            {
-                name: "Item set 1",
-                description: "Description meo meo meo",
-                items: ['0', '1', '5']
-            }
-        ]
-    }
 
     return (
         <>
@@ -174,8 +205,8 @@ export default async function Page({ params }: { params: { id: string }}){
                 <main className="flex flex-col gap-y-4">
                     <h1 className="text-3xl font-bold text-gray-950">✏️ Edit your game</h1>
                     <p className="text-sm text-gray-500 hidden md:block">Make changes and submit the form below to update this game item</p>
-                    {gameTypeId === 1 && <LiveQuizEditForm data={gameFullData} id={id}/>}
-                    {gameTypeId === 2 && <ItemCollectingEditForm data={dummyItemCollecting} id={id} gameDataId={data.game_data_id}/>}
+                    {gameTypeId === 1 && <LiveQuizEditForm data={gameFullData} id={id} gameDataId={data.game_data_id}/>}
+                    {gameTypeId === 2 && <ItemCollectingEditForm data={gameFullData} id={id} gameDataId={data.game_data_id}/>}
                 </main>
             )}
         </>

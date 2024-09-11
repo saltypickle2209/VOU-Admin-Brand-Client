@@ -46,12 +46,14 @@ export type Event = {
 }
 
 export type ItemSet = {
+    _id?: string,
     name: string,
     description: string,
     items: string[]
 }
 
 export type CollectableItem = {
+    _id?: string
     image: string | File | null,
     name: string,
     description: string,
