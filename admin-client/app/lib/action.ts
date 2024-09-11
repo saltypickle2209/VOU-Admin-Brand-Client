@@ -342,3 +342,55 @@ export async function deleteUser(userId: string, formData: FormData) {
     revalidatePath("/users")
     redirect("/users")
 }
+
+const gameDataSchema = z.object({
+    gameName: z
+    .string()
+    .min(1, {message: "(*)Game's name is required"}),
+    description: z
+    .string()
+    .min(1, {message: "(*)Game's description is required"}),
+    instruction: z
+    .string()
+    .min(1, {message: "(*)Game's instruction is required"}),
+    gameImage: z
+    .instanceof(File, {message: "(*)Game's image is required"})
+    .refine((file) => ["image/jpeg", "image/png"].includes(file.type), {
+        message: "(*)Only JPEG or PNG is supported"
+    })
+})
+
+export type UpdateGameDataFormState = {
+    errors?: {
+        gameName?: string[],
+        description?: string[],
+        instruction?: string[],
+        gameImage?: string[],
+    },
+    message?: string | null
+}
+
+export async function updateGameData(prevState: UpdateGameDataFormState, formData: FormData): Promise<UpdateGameDataFormState> {
+    const validateFields = gameDataSchema.safeParse({
+        gameName: formData.get("gameName"),
+        description: formData.get("description"),
+        instruction: formData.get("instruction"),
+        gameImage: formData.get("gameImage")
+    })
+
+
+    if(!validateFields.success) {
+        const errors = validateFields.error.flatten().fieldErrors
+        console.log(errors);
+
+        return {
+            errors: errors,
+            message: "Invalid Form."
+        }
+    } else {
+        return {
+            errors: undefined,
+            message: "Success"
+        }
+    }
+}

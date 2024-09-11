@@ -1,18 +1,14 @@
 "use client";
 
 import { createVoucher } from "@/app/lib/action";
+import { PhotoIcon } from "@heroicons/react/24/outline";
+import Image from "next/image";
 import React, { FormEvent, useEffect, useRef, useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 
 const initialState = {
   message: "",
   errors: undefined,
-  fieldValues: {
-    voucherName: "",
-    image: "",
-    value: "",
-    description: "",
-  },
 };
 
 export default function AddVoucher() {
@@ -21,6 +17,7 @@ export default function AddVoucher() {
   const [image, setImage] = useState<File | null>(null);
   const [voucherValue, setVoucherValue] = useState<string>("");
   const [description, setDescription] = useState<string>("");
+  const [preview, setPreview] = useState<string | null>(null);
 
   const Submit = () => {
     const buttonStatus = useFormStatus();
@@ -49,6 +46,8 @@ export default function AddVoucher() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length !== 0) {
       setImage(e.target.files[0]);
+      const imageUrl = URL.createObjectURL(e.target.files[0]);
+      setPreview(imageUrl);
     }
   };
 
@@ -82,7 +81,40 @@ export default function AddVoucher() {
               {state.errors?.voucherName}
             </span>
           </div>
-          <div>
+          <label
+            htmlFor="game_image"
+            className=" h-[250px] cursor-pointer text-violet-500 hover:text-violet-800 transition-colors duration-300  relative flex flex-col justify-center items-center">
+            {!preview && !image ? (
+              <>
+                <div className="absolute w-full h-full border-4 border-dashed border-violet-500 rounded-md hover:border-violet-800 transition-colors duration-300"></div>
+                <PhotoIcon className="w-20" />
+                <p className="text-base font-semibold">
+                  Update your game&apos;s image
+                </p>
+              </>
+            ) : (
+              <div className="overflow-hidden border-4 border-violet-500 hover:border-violet-800 transition-colors duration-300 rounded-md">
+                <Image
+                  src={preview!}
+                  alt={image?.name!}
+                  className="object-fill w-full h-full rounded-md"
+                  width={400}
+                  height={400}
+                />
+              </div>
+            )}
+            <input
+              id="game_image"
+              type="file"
+              className="hidden"
+              accept="image/png, image/jpeg"
+              onChange={handleFileChange}
+            />
+          </label>
+          <span className=" text-sm text-red-600 font-semibold">
+            {state.errors?.image}
+          </span>
+          {/* <div>
             <label
               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               htmlFor="image">
@@ -104,7 +136,7 @@ export default function AddVoucher() {
             <span className=" text-sm text-red-600 font-semibold">
               {state.errors?.image}
             </span>
-          </div>
+          </div> */}
           <div>
             <input
               name="value"
@@ -161,7 +193,7 @@ export default function AddVoucher() {
         </svg>
         <span className="sr-only">Info</span>
         <div>
-          <span className="font-medium">Add voucher successfully !</span>
+          <span className="font-medium">Add voucher successfully</span>
         </div>
       </div>
     </div>
