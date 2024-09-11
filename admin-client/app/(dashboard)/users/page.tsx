@@ -7,12 +7,14 @@ import { revalidateUsers } from "@/app/lib/action";
 import SearchBar from "@/app/ui/components/search_bar";
 import Pagination from "@/app/ui/components/pagination";
 import UsersList from "@/app/ui/components/users/users_list";
+import { baseURL } from "@/app/lib/definition";
+import { getToken } from "@/app/lib/server_utility";
 
 export const metadata: Metadata = {
     title: 'Users',
 };
 
-export default function Page({
+export default async function Page({
     searchParams 
 }: {
     searchParams?: { 
@@ -21,6 +23,25 @@ export default function Page({
 }}) {
     const query = searchParams?.query || '';
     const currentPage = Number(searchParams?.page) || 1;
+    let data: any = null
+
+    try{
+        const response = await fetch(`${baseURL}/auth/users/search?page=${currentPage}&search=${query}`, { 
+            cache: 'no-store',
+            headers: {
+                'Authorization': `Bearer ${getToken()}`
+            }
+        })
+        if(!response.ok){
+            throw new Error()
+        }
+        data = await response.json()
+    }
+    catch (error){
+        throw new Error('Something went wrong')
+    }
+
+    const totalPages = data.totalPages
 
     return (
         <main className="flex flex-col gap-y-4">
@@ -37,8 +58,8 @@ export default function Page({
             <div className="flex justify-end items-center gap-4">
                 <SearchBar placeholder="Search for users"/>
             </div>
-            <UsersList query={query} currentPage={currentPage} />
-            <Pagination totalPages={3}/>
+            <UsersList data={data} />
+            <Pagination totalPages={totalPages}/>
         </main>
     )
 }
