@@ -40,9 +40,6 @@ export default function Page() {
                     <VoucherChart/> 
                 </Suspense>
             </div>
-            <Suspense fallback={<TopEventsSkeleton/>}>
-                <TopEvents/>
-            </Suspense>
         </main>
     )
 }

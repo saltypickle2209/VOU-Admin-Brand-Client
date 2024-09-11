@@ -1,86 +1,62 @@
-import DonutChart from "../donut_chart";
+import { getFullDateFromObject } from "@/app/lib/utility";
+import { baseURL } from "@/app/lib/definition";
+import { getToken } from "@/app/lib/server_utility";
+import AreaChart from "../area_chart";
 
 export default async function VoucherChart() {
-    function delay(ms: number): Promise<void> {
-        return new Promise(resolve => setTimeout(resolve, ms));
+    const today = new Date();
+    const categories: string[] = []
+
+    for (let i = 29; i >= 0; i--) {
+      const pastDay = new Date();
+      pastDay.setDate(today.getDate() - i); // Subtract i days from today
+      const day = pastDay.getDate();
+      const month = pastDay.toLocaleString('default', { month: 'long' }); // Get month name
+      categories.push(`${day} ${month}`);
     }
 
-    await delay(5000);
+    const past30Date = new Date()
+    past30Date.setDate(today.getDate() - 30)
+    const startDate = getFullDateFromObject(past30Date)
+    const endDate = getFullDateFromObject(today)
 
-    // fake data fetch
-    const series: number[] = []
-    for (let i = 0; i < 5; i++){
-      const randomInt = Math.floor(Math.random() * 5001) + 3000;
-      series.push(randomInt)
+    // fetch data 
+    let voucherData: any = null
+
+    try{
+      const response = await fetch(`${baseURL}/voucher/voucher/getVouchersCountByDay?startDate=${startDate}&endDate=${endDate}`, { 
+          cache: 'no-store',
+          headers: {
+              'Authorization': `Bearer ${getToken()}`
+          }
+      })
+      if(!response.ok){
+          throw new Error()
+      }
+      voucherData = await response.json()
+    }
+    catch (error){
+      throw new Error('Something went wrong')
     }
 
-    const labels: string[] = ["Event A", "Event B", "Event C", "Event D", "Event E"]
+    const data: number[] = voucherData.map((item: any) => (Number(item.voucher_count)))
 
-    const options = {
-        chart: {
-            width: "100%",
-            fontFamily: "Inter, sans-serif",
+    // Also change this
+    const series = [
+        {
+          name: "New vouchers",
+          data: data,
+          color: "#1A56DB",
         },
-        stroke: {
-            colors: ["transparent"],
-            linecap: ""
-        },
-        plotOptions: {
-            pie: {
-                donut: {
-                    labels: {
-                        show: true,
-                        name: {
-                            show: true,
-                            fontFamily: "Inter, sans-serif",
-                            offsetY: 20,
-                        },
-                        total: {
-                            showAlways: true,
-                            show: true,
-                            label: "Vouchers",
-                            fontFamily: "Inter, sans-serif",
-                            formatter: function (w: any) {
-                              const sum = w.globals.seriesTotals.reduce((a: any, b: any) => {
-                                return a + b
-                              }, 0)
-                              return sum
-                            }
-                        },
-                        value: {
-                            show: true,
-                            fontFamily: "Inter, sans-serif",
-                            offsetY: -20
-                        }
-                    },
-                    size: "65%",
-                }
-            }
-        },
-        labels: labels,
-        dataLabels: {
-            enabled: false,
-        },
-        legend: {
-            fontFamily: "Inter, sans-serif"
-        },
-        xaxis: {
-            axisTicks: {
-              show: false,
-            },
-            axisBorder: {
-              show: false,
-            }
-        }
-    }
+    ]
 
     return (
         <div className="flex flex-col w-full h-auto gap-y-4 p-6 bg-white rounded-md shadow-md xl:w-1/2">
             <div className="flex flex-col gap-y-1">
                 <p className="text-sm text-gray-500">Vouchers published this month</p>
-                <p className="text-3xl font-bold text-gray-950">{series.reduce((acc, curr) => acc + curr, 0)}</p>
+                <p className="text-3xl font-bold text-gray-950">{data.reduce((acc, curr) => acc + curr, 0)}</p>
             </div>
-            <DonutChart series={series} labels={labels}/>
+            <AreaChart series={series} categories={categories}/>
         </div>
     )
 

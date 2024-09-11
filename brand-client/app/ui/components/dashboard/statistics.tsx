@@ -64,12 +64,32 @@ async function getPlayerStatistics() {
     }
 }
 
+async function getVoucherStatistics() {
+    try{
+        const response = await fetch(`${baseURL}/voucher/voucher/getAll`, { 
+            cache: 'no-store',
+            headers: {
+                'Authorization': `Bearer ${getToken()}`
+            }
+        })
+        if(!response.ok){
+            throw new Error()
+        }
+        const voucherData = await response.json()
+        return voucherData
+    }
+    catch (error){
+        throw new Error('Something went wrong')
+    }
+}
+
 export default async function Statistics() {
     // fetch data
-    const [eventData, gameData, playerData] = await Promise.all([
+    const [eventData, gameData, playerData, voucherData] = await Promise.all([
         getEventStatistics(),
         getGameStatistics(),
-        getPlayerStatistics()
+        getPlayerStatistics(),
+        getVoucherStatistics()
     ])
     
     return (
@@ -103,7 +123,7 @@ export default async function Statistics() {
             </div>
             <div className="flex flex-col-reverse gap-4 sm:flex-row sm:gap-y-0 justify-between items-center w-3/4 h-auto place-self-center md:w-full md:h-32 p-6 bg-white rounded-md shadow-md">
                 <div className="flex flex-col grow gap-y-1">
-                    <p className="text-3xl text-center font-bold text-gray-950 sm:text-start">1000</p>
+                    <p className="text-3xl text-center font-bold text-gray-950 sm:text-start">{voucherData.length}</p>
                     <p className="text-sm text-center text-gray-500 sm:text-start">Vouchers Published</p>
                 </div>
                 <div className="flex justify-center items-center shrink-0 w-14 h-14 rounded-full bg-rose-200">
