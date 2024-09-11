@@ -7,20 +7,15 @@ import {string, z} from 'zod'
 
 const baseURL = "http://localhost:8000"
 
-const MAX_FILE_SIZE = 1024 * 1024 * 5;
-const ACCEPTED_FILE_TYPES = ['image/png', 'image/jpg'];
-
 // ---------- VOUCHER SCHEMA ----------
 
 const voucherSchema = z.object({
     voucherName: z.string().min(1, {message: "Voucher's name cannot be empty"}),
-    // image: z.instanceof(File, {
-    //     message: "File must be JPG of JPEG"
-    // }).refine(file => {
-    //     return ACCEPTED_FILE_TYPES.includes(file.type);
-    // }, {
-    //     message: "File must be JPG of JPEG"
-    // }), 
+    image: z
+    .instanceof(File, {message: "Game's image is required"})
+    .refine((file) => ["image/jpeg", "image/png"].includes(file.type), {
+        message: "(*)Only JPEG or PNG is supported"
+    }),
     value: z.preprocess((value) => parseFloat(value as string), z.number({message: "Voucher's value must be a number"}).min(0, {message: "Voucherr's value must be a positive number"})),
     description: z.string().min(1, {message: "Voucher's description cannot be empty"})
 })
@@ -40,17 +35,26 @@ export async function revalidateVouchers() {
 // ---------- CREATE VOUCHER ----------
 
 export async function createVoucher(prevState: any, formData: FormData) {
-    const voucherName = formData.get("voucherName");
-    const image = formData.get("image");
-    const value = formData.get("value");
-    const description = formData.get("description");
+    // const voucherName = formData.get("voucherName");
+    // const image = formData.get("image");
+    // const value = formData.get("value");
+    // const description = formData.get("description");
+
+    // const validatedFields = voucherSchema.safeParse({
+    //     voucherName,
+    //     image,
+    //     value,
+    //     description,
+    // });
+
 
     const validatedFields = voucherSchema.safeParse({
-        voucherName,
-        image,
-        value,
-        description,
+        voucherName: formData.get("voucherName"),
+        image: formData.get("image"),
+        value: formData.get("value"),
+        description: formData.get("description"),
     });
+    
     
     if(!validatedFields.success) {
         const errors = validatedFields.error.flatten().fieldErrors;
@@ -59,29 +63,28 @@ export async function createVoucher(prevState: any, formData: FormData) {
             message: "error",
             errors: {
                 voucherName: errors['voucherName']?.[0] ? `(*)${errors['voucherName']?.[0]}` : '',
-                // image: errors['image']?.[0] ? `(*)${errors['image']?.[0]}` : '',
-                image: "",
+                image: errors['image']?.[0] ? `(*)${errors['image']?.[0]}` : '',
                 value: errors['value']?.[0] ? `(*)${errors['value']?.[0]}` : '',
                 description: errors['description']?.[0] ? `(*)${errors['description']?.[0]}` : '',
             },
-            fieldValues: {
-                voucherName,
-                image,
-                value,
-                description
-            }
+            // fieldValues: {
+            //     voucherName,
+            //     image,
+            //     value,
+            //     description
+            // }
         };
     }
 
     return {
         message: "success",
         errors: undefined,
-        fieldValues: {
-          voucherName: "",
-          image: "",
-          value: "",
-          description: "",
-        },
+        // fieldValues: {
+        //   voucherName: "",
+        //   image: "",
+        //   value: "",
+        //   description: "",
+        // },
     }
 }
 
