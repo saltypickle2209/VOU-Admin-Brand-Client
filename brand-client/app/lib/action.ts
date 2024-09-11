@@ -969,11 +969,14 @@ export async function updateEvent(prevState: EventFormState, formData: FormData)
         eventFormData.append('description', formData.get('description') as string)
         eventFormData.append('start_time', formData.get('startDate') as string)
         eventFormData.append('end_time', formData.get('endDate') as string)
-        eventFormData.append('games', JSON.stringify(gameIds))
+        eventFormData.append('gameIds', JSON.stringify(gameIds))
 
         try{
             const response = await fetch(`${baseURL}/event/${formData.get('id')}`, {
-                method: 'POST',
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${getToken()}`
+                },
                 body: eventFormData
             })
         
