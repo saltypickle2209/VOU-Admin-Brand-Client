@@ -75,7 +75,7 @@ export default async function VoucherChart() {
     }
 
     return (
-        <div className="flex flex-col w-full h-auto gap-y-4 p-6 bg-white rounded-md shadow-md xl:w-2/5">
+        <div className="flex flex-col w-full h-auto gap-y-4 p-6 bg-white rounded-md shadow-md xl:w-1/2">
             <div className="flex flex-col gap-y-1">
                 <p className="text-sm text-gray-500">Vouchers published this month</p>
                 <p className="text-3xl font-bold text-gray-950">{series.reduce((acc, curr) => acc + curr, 0)}</p>

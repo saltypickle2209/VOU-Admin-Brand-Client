@@ -10,6 +10,7 @@ import GamesGrid from "@/app/ui/components/games/game_grid";
 import Pagination from "@/app/ui/components/pagination";
 import { baseURL, Game } from "@/app/lib/definition";
 import EmptyGrid from "@/app/ui/components/empty_grid";
+import { getToken } from "@/app/lib/server_utility";
 
 export const metadata: Metadata = {
     title: 'Games',
@@ -27,7 +28,12 @@ export default async function Page({
     let data: any = null
 
     try{
-        const response = await fetch(`${baseURL}/game/search?page=${currentPage}&search=${query}`, { cache: 'no-store' })
+        const response = await fetch(`${baseURL}/game/search?page=${currentPage}&search=${query}`, { 
+            cache: 'no-store',
+            headers: {
+                'Authorization': `Bearer ${getToken()}`
+            }
+        })
         if(!response.ok){
             throw new Error()
         }

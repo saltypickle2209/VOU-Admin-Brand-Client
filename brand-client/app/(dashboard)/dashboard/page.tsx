@@ -33,10 +33,10 @@ export default function Page() {
                 <Statistics/>
             </Suspense>
             <div className="flex flex-col gap-4 xl:flex-row">
-                <Suspense fallback={<ChartSkeleton widthClass="w-3/5" chartHeight="h-[250px]"/>}>
+                <Suspense fallback={<ChartSkeleton widthClass="w-1/2" chartHeight="h-[250px]"/>}>
                     <PlayerChart/>
                 </Suspense>
-                <Suspense fallback={<ChartSkeleton widthClass="w-2/5" chartHeight="h-[250px]"/>}>
+                <Suspense fallback={<ChartSkeleton widthClass="w-1/2" chartHeight="h-[250px]"/>}>
                     <VoucherChart/> 
                 </Suspense>
             </div>

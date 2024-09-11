@@ -1,7 +1,7 @@
 import { baseURL, Game } from "@/app/lib/definition";
 import Link from 'next/link';
 import GameList from './game_list';
-import { getDatePart } from '@/app/lib/utility';
+import { getClientSideToken, getDatePart } from '@/app/lib/utility';
 import {
     CubeTransparentIcon,
     ArrowLongRightIcon
@@ -26,24 +26,35 @@ export default function ChooseGameModalContent({
     // fetch game's data and parse to Game[]
     useEffect(() => {
         async function fetchGames() {
-            let res = await fetch(`${baseURL}/game/all`)
-            let data = await res.json()
+            let res = await fetch(`${baseURL}/game/noEvent/upcoming`, {
+                headers: {
+                    'Authorization': `Bearer ${getClientSideToken()}`
+                }
+            })
 
-            const formattedData: Game[] = data.map((item: any) => ({
-                id: item.id,
-                poster: item.poster,
-                name: item.name,
-                description: item.description,
-                start_date: getDatePart(item.start_time),
-                end_date: getDatePart(item.end_time),
-                game_type_id: item.game_type_id,
-                voucher: item.voucher_template_id,
-                amount: item.amount
-            }))
+            if(!res.ok) {
+                setIsEmpty(true)
+                setIsFetching(false)
+            }
+            else {
+                let data = await res.json()
+    
+                const formattedData: Game[] = data.games.map((item: any) => ({
+                    id: item.id,
+                    poster: item.poster,
+                    name: item.name,
+                    description: item.description,
+                    start_date: getDatePart(item.start_time),
+                    end_date: getDatePart(item.end_time),
+                    game_type_id: item.game_type_id,
+                    voucher: item.voucher_template_id,
+                    amount: item.amount
+                }))
 
-            setGameData(formattedData)
-            setIsEmpty(data.length === 0)
-            setIsFetching(false)
+                setGameData(formattedData)
+                setIsEmpty(data.length === 0)
+                setIsFetching(false)
+            }
         }
         fetchGames()
     }, [])

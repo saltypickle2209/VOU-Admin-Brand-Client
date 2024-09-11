@@ -1,4 +1,5 @@
 import { baseURL } from "@/app/lib/definition"
+import { getToken } from "@/app/lib/server_utility"
 import { formatDate } from "@/app/lib/utility"
 import { ChevronRightIcon, CubeTransparentIcon } from "@heroicons/react/24/outline"
 import Link from "next/link"
@@ -8,7 +9,12 @@ export default async function EventGameList({ eventId }: { eventId: string }){
     let isEmpty: boolean = false
 
     try{
-        const response = await fetch(`${baseURL}/game/event/${eventId}`, { cache: 'no-store' })
+        const response = await fetch(`${baseURL}/game/event/${eventId}`, { 
+            cache: 'no-store',
+            headers: {
+                'Authorization': `Bearer ${getToken()}`
+            }
+         })
         if(response.status === 404){
             throw new Error("404")
         }
