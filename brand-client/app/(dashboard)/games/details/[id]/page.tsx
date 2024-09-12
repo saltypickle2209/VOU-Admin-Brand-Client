@@ -123,14 +123,36 @@ export default async function Page({ params }: { params: { id: string}}) {
             }
         }
     }
+
+    // get voucher
+    let voucherData: any = null
+    
+    try{
+        const response = await fetch(`${baseURL}/voucher/voucherTemplate/getByID?id=${data.voucher_template_id}`, {
+            headers: {
+                'Authorization': `Bearer ${getToken()}`
+            }
+        })
+        if(!response.ok){
+            throw new Error(await response.text())
+        }
+        voucherData = await response.json()
+    }
+    catch (error: any){
+        voucherData = {
+            name: "Dummy voucher",
+            description: "Dummy description",
+            image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmUbXIH85ZcmIpMRatVL08HSbZSWVdDP5nnw&s"
+        }
+    }
     
     
     return (
         <main className="flex flex-col gap-y-4">
             <h1 className="text-3xl font-bold text-gray-950">🎮 Game's detail</h1>
             <p className="text-sm text-gray-500 hidden md:block">You can view some basic information of your created game here</p>
-            {gameTypeId === 1 && <LiveQuizDetail data={data} gameData={gameData}/>}
-            {gameTypeId === 2 && <ItemCollectingDetail data={data} gameData={gameData}/>}
+            {gameTypeId === 1 && <LiveQuizDetail data={data} gameData={gameData} voucherData={voucherData}/>}
+            {gameTypeId === 2 && <ItemCollectingDetail data={data} gameData={gameData} voucherData={voucherData}/>}
         </main>
     )
 }

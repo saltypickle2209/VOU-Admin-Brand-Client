@@ -11,13 +11,13 @@ import { useState } from 'react';
 import clsx from 'clsx';
 
 // remember to add prop to this one
-export default function ItemCollectingDetail({ data, gameData }: { data: any, gameData: any }){
+export default function ItemCollectingDetail({ data, gameData, voucherData }: { data: any, gameData: any, voucherData: any }){
     const [isConfiguringItems, setIsConfiguringItems] = useState<boolean>(true)
     const itemIds = gameData.items.map((item: any) => (item._id))
 
     return (
         <div className="w-full px-6 grid grid-cols-1 divide-y-2 divide-gray-300 lg:py-6 lg:px-0 lg:divide-y-0 lg:divide-x-2 lg:grid-cols-2 bg-white rounded-md shadow-md">
-            <BasicInformation data={data}/>
+            <BasicInformation data={data} voucherData={voucherData}/>
             {isConfiguringItems ? (
                 <div className="flex flex-col gap-y-4 py-8 lg:px-8 lg:py-0">
                     <div className="flex justify-between items-center">
