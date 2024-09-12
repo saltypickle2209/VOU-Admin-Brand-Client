@@ -15,7 +15,7 @@ import { useFormState } from 'react-dom';
 import { Question } from '@/app/lib/definition';
 
 // remember to add voucher list props
-export default function LiveQuizForm() {
+export default function LiveQuizForm({ voucherData }: { voucherData: any }) {
     const initialState: LiveQuizFormState = { message: null, errors: {} }
     const [state, formAction] = useFormState(createLiveQuiz, initialState)
 
@@ -217,8 +217,9 @@ export default function LiveQuizForm() {
                         <div className="relative w-3/5 flex flex-col">
                             <select id="voucher" value={voucher} className="block w-full py-2 px-0.5 text-sm text-gray-950 bg-transparent border-1 border-l-0 border-r-0 border-t-0 border-gray-500 focus:outline-none focus:ring-0 focus:border-violet-800 transition-colors duration-300 peer" required onChange={(e) => setVoucher(e.target.value)}>
                                 <option value="">Select a voucher</option>
-                                <option value="1">Voucher A</option>
-                            <option value="2">Voucher B</option>
+                                {voucherData.map((voucher: any) => (
+                                    <option value={`${voucher.id}`}>{voucher.name}</option>
+                                ))}
                             </select>
                             <label htmlFor="voucher" className="absolute text-sm text-gray-500 transform -translate-y-6 scale-75 top-4 left-0.5 origin-top-left z-10 peer-focus:text-violet-800 after:content-['*'] after:ml-0.5 after:text-red-500 duration-300">Voucher</label>
                             {state.errors?.voucher && state.errors.voucher.map((error: string) => (
